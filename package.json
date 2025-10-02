@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "An Express backend for a messaging app",
   "scripts": {
-    "dev": "tsx --watch --env-file .env src/index.ts",
-    "start": "node --env-file .env dist/index.js",
+    "dev": "tsx --watch --env-file .env src/server.ts",
+    "start": "node --env-file .env dist/server.js",
     "build": "tsc",
     "test": "vitest",
     "test:run": "vitest --run",
@@ -25,7 +25,9 @@
   },
   "homepage": "https://github.com/IgnacioGandur/messaging_app_back_end#readme",
   "dependencies": {
-    "express": "^5.1.0"
+    "@types/supertest": "^6.0.3",
+    "express": "^5.1.0",
+    "supertest": "^7.1.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

@@ -1,11 +1,10 @@
-import express, { type Request, Response } from "express";
+import express from "express";
+import router from "./routes/router.js";
 
 const app = express();
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-app.get("/", (_req: Request, res: Response) => {
-    res.json({
-        message: "another",
-    })
-})
+app.use(router);
 
 export default app;
