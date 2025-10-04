@@ -6,9 +6,9 @@
     "dev": "tsx --watch --env-file .env src/server.ts",
     "start": "node --env-file .env dist/server.js",
     "build": "tsc",
-    "test": "vitest",
-    "test:run": "vitest --run",
-    "test:ui": "vitest --ui",
+    "test": "NODE_ENV=test && vitest",
+    "test:run": "NODE_ENV=test && vitest --run",
+    "test:ui": "NODE_ENV=test && vitest --ui",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -26,8 +26,18 @@
   "homepage": "https://github.com/IgnacioGandur/messaging_app_back_end#readme",
   "dependencies": {
     "@prisma/client": "^6.16.3",
+    "@quixo3/prisma-session-store": "^3.1.13",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express-session": "^1.18.2",
+    "@types/passport": "^1.0.17",
+    "@types/passport-local": "^1.0.38",
     "@types/supertest": "^6.0.3",
+    "bcryptjs": "^3.0.2",
     "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "express-validator": "^7.2.1",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
     "supertest": "^7.1.4"
   },
   "devDependencies": {

@@ -1,26 +1,93 @@
-import { type Request, Response } from "express";
+import userModel from "../db/user.js";
+import bcrypt from "bcryptjs";
+import { type Request, Response, NextFunction } from "express";
 
 const authController = {
-    register: async (req: Request, res: Response) => {
+    register: async (req: Request<{}, {}, { username: string; password: string; }>, res: Response, next: NextFunction) => {
         try {
             const {
                 username,
                 password
             } = req.body;
 
-            return res.json({
-                success: true,
-                message: "User registered successfully!",
-                user: {
-                    username,
-                    password
-                },
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const user = await userModel.createUser(username, hashedPassword);
+
+            req.login(user, (error) => {
+                if (error) {
+                    return next(error);
+                } else {
+                    return res.json({
+                        success: true,
+                        message: "User registered successfully!",
+                        user
+                    });
+                }
             });
         } catch (error) {
+            console.error("Controller error:", error);
             return res.status(500).json({
                 success: false,
                 message: "Server error. We were not able to register a new user.",
             });
+        }
+    },
+
+    login: async (req: Request<{}, {}, { username: string; password: string; }>, res: Response) => {
+        try {
+            const {
+                username,
+            } = req.body;
+
+            const user = await userModel.getUserByUsername(username);
+
+            return res.json({
+                success: true,
+                message: "User logged successfully!",
+                user
+            });
+        } catch (error) {
+            console.error("Controller error:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Server error. We were not able to log you.",
+            })
+        }
+    },
+
+    logout: async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            req.logout((error) => {
+                if (error) {
+                    return next(error);
+                } else {
+                    return res.json({
+                        success: true,
+                        message: "User logged out successfully!"
+                    });
+                }
+            })
+        } catch (error) {
+            console.error("Controller error:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Server error. We were not able to log you out.",
+            });
+        }
+    },
+
+    protectedRoute: async (_req: Request, res: Response) => {
+        try {
+            return res.json({
+                success: true,
+                message: "Protected route reached! You are authenticated."
+            });
+        } catch (error) {
+            console.error("Controller error:", error);
+            return res.status(500).json({
+                success: false,
+                message: "Server error. We were not able to reach the protected route."
+            })
         }
     }
 }
