@@ -4,16 +4,26 @@ import session from "express-session";
 import passport from "passport";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import { PrismaClient } from "./generated/prisma/index.js";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
-app.use(express.urlencoded({ extended: true }));
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(session({
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 7 // 7 Days cookie.
+        maxAge: 1000 * 60 * 60 * 24 * 7, // 7 Days cookie.
+        secure: false,
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     },
-    secret: "random secret",
+    secret: String(process.env.SESSION_SECRET),
     resave: false,
     saveUninitialized: false,
     store: new PrismaSessionStore(
@@ -31,7 +41,8 @@ app.use(session({
         }
     )
 }));
-app.use(passport.authenticate("session"));
+app.use(passport.initialize());
+app.use(passport.session());
 
 import "./middlewares/passport/passport.js";
 

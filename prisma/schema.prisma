@@ -14,17 +14,87 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int     @id @default(autoincrement())
-  username  String  @unique @db.VarChar(30)
-  password  String
-  firstName String? @db.VarChar(30)
-  lastName  String? @db.VarChar(30)
-}
-
 model Session {
   id        String   @id
   sid       String   @unique
   data      String
   expiresAt DateTime
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  username     String        @unique @db.VarChar(30)
+  password     String
+  firstName    String?       @db.VarChar(30)
+  lastName     String?       @db.VarChar(30)
+  joinedOn     DateTime      @default(now())
+  messages     Message[]     @relation("UserMessages")
+  participants Participant[]
+  friendsA     Friendship[]  @relation("UserAFriends")
+  friendsB     Friendship[]  @relation("UserBFriends")
+}
+
+model Friendship {
+  id        Int              @id @default(autoincrement())
+  userAId   Int
+  userBId   Int
+  createdAt DateTime         @default(now())
+  status    FriendshipStatus @default(PENDING)
+  userA     User             @relation("UserAFriends", fields: [userAId], references: [id])
+  userB     User             @relation("UserBFriends", fields: [userBId], references: [id])
+
+  @@unique([userAId, userBId])
+}
+
+model Conversation {
+  id           Int           @id @default(autoincrement())
+  title        String?
+  isGroup      Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  messages     Message[]
+  participants Participant[]
+}
+
+model Participant {
+  userId         Int
+  conversationId Int
+  joinedAt       DateTime     @default(now())
+  role           GroupRole    @default(USER)
+  user           User         @relation(fields: [userId], references: [id])
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+
+  @@id([userId, conversationId])
+}
+
+model Message {
+  id             Int          @id @default(autoincrement())
+  conversationId Int
+  senderId       Int
+  content        String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  deleted        Boolean      @default(false)
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  sender         User         @relation("UserMessages", fields: [senderId], references: [id])
+  attachments    Attachment[]
+}
+
+model Attachment {
+  id         Int      @id @default(autoincrement())
+  messageId  Int
+  fileUrl    String
+  fileType   String
+  uploadedAt DateTime @default(now())
+  message    Message  @relation(fields: [messageId], references: [id])
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+}
+
+enum GroupRole {
+  OWNER
+  ADMIN
+  USER
 }

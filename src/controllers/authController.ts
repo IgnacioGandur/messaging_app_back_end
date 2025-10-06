@@ -33,7 +33,7 @@ const authController = {
         }
     },
 
-    login: async (req: Request<{}, {}, { username: string; password: string; }>, res: Response) => {
+    login: async (req: Request<{}, {}, { username: string; password: string; }>, res: Response, next: NextFunction) => {
         try {
             const {
                 username,
@@ -41,10 +41,16 @@ const authController = {
 
             const user = await userModel.getUserByUsername(username);
 
-            return res.json({
-                success: true,
-                message: "User logged successfully!",
-                user
+            req.login(user!, (error) => {
+                if (error) {
+                    return next(error);
+                } else {
+                    return res.json({
+                        success: true,
+                        message: "User logged successfully!",
+                        user
+                    });
+                }
             });
         } catch (error) {
             console.error("Controller error:", error);
@@ -57,10 +63,15 @@ const authController = {
 
     logout: async (req: Request, res: Response, next: NextFunction) => {
         try {
+            res.clearCookie("connect.sid", { path: "/" });
+
             req.logout((error) => {
                 if (error) {
                     return next(error);
                 } else {
+                    req.session.destroy((error) => {
+                        return next(error);
+                    });
                     return res.json({
                         success: true,
                         message: "User logged out successfully!"
