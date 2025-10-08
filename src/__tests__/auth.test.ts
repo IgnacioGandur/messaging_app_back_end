@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import supertest from "supertest";
 import app from "../app.js";
 import deleteAllUsers from "./utilities/deleteAllUsers.js";
+import createTestUser from "./utilities/createTestUser.js";
 
 beforeEach(async () => {
     await deleteAllUsers();
@@ -54,15 +55,8 @@ describe("Auth Router", () => {
     });
 
     it("POST | Should successfully login.", async () => {
-        await supertest(app)
-            .post("/auth/register")
-            .type("form")
-            .send({
-                username: "Ignacio",
-                password: "bla",
-                confirmPassword: "bla"
-            })
-            .expect(200);
+
+        await createTestUser("Ignacio", "bla");
 
         const agent = supertest.agent(app);
 
@@ -145,15 +139,8 @@ describe("Auth Router", () => {
     });
 
     it("GET | Should log out the current user.", async () => {
-        await supertest(app)
-            .post("/auth/register")
-            .type("form")
-            .send({
-                username: "Ignacio",
-                password: "bla",
-                confirmPassword: "bla",
-            })
-            .expect(200);
+
+        await createTestUser("Ignacio", "bla");
 
         const agent = supertest.agent(app);
 

@@ -5,6 +5,8 @@ import { type User } from "../../generated/prisma/client.js";
 
 export default new Strategy(async function verify(username, password, done) {
     try {
+        console.log("username in strategy:", username);
+        console.log("password in strategy:", password);
         const user = await userModel.getUserByUsername(username) as User;
 
         // If user doesn't exist.

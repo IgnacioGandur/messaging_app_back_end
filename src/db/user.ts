@@ -1,6 +1,12 @@
 import client from "./client.js";
 import test_client from "./test_client.js";
-import { type PrismaClient, type User as UserType } from "../generated/prisma/client.js";
+import { type PrismaClient, type User as UserType, Prisma } from "../generated/prisma/client.js";
+
+type UserWithoutPassword = Omit<Prisma.UserGetPayload<{}>, "password">;
+
+type UpdatableFields = {
+    [key: string]: any;
+};
 
 class User {
     prisma: PrismaClient;
@@ -25,11 +31,14 @@ class User {
         }
     }
 
-    async getUserByUsername(username: string): Promise<UserType | null> {
+    async getUserByUsername(username: string, omitPassword: boolean = false): Promise<UserWithoutPassword | UserType | null> {
         try {
             const user = await this.prisma.user.findUnique({
                 where: {
-                    username
+                    username,
+                },
+                omit: {
+                    password: omitPassword,
                 }
             });
 
@@ -40,18 +49,51 @@ class User {
         }
     }
 
-    async getUserById(id: number): Promise<UserType | null> {
+    async getUserById(id: number | string, omitPassword: boolean = false): Promise<UserType | UserWithoutPassword | null> {
         try {
             const user = await this.prisma.user.findUnique({
                 where: {
                     id: Number(id),
                 },
+                omit: {
+                    password: omitPassword
+                }
             });
 
             return user;
         } catch (error) {
             console.error("Prisma error:", error);
             throw new Error("Something went wrong when trying to get a user by it's id.");
+        }
+    }
+
+    async getAllUsers(): Promise<UserWithoutPassword[]> {
+        try {
+            const users = await this.prisma.user.findMany({
+                omit: {
+                    password: true,
+                }
+            });
+            return users;
+        } catch (error) {
+            console.error("Prisma error:", error);
+            throw new Error("Something went wrong when trying to get all users.");
+        }
+    }
+
+    async updateUser(id: string | number, fields: UpdatableFields): Promise<UserType> {
+        try {
+            const user = await this.prisma.user.update({
+                where: {
+                    id: Number(id)
+                },
+                data: fields
+            });
+
+            return user;
+        } catch (error) {
+            console.error("Prisma error: ", error);
+            throw new Error("Something went wrong when trying to update a user.");
         }
     }
 }
