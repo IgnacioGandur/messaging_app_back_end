@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import userModel from "../db/user.js";
 import cleanEmptyFields from "../utilities/cleanEmptyFields.js";
 import bcrypt from "bcryptjs";
@@ -81,12 +81,29 @@ const usersController = {
         }
     },
 
-    delete: async (_req: Request, res: Response) => {
+    delete: async (req: Request, res: Response, next: NextFunction) => {
         try {
-            console.log("deleted")
-            return res.json({
-                message: "hello"
-            })
+            const { id } = req.user as { id: string | number };
+            const user = await userModel.deleteUser(id);
+
+            res.clearCookie("connect.sid", { path: "/" });
+
+            req.logout((error) => {
+                if (error) {
+                    return next(error);
+                } else {
+                    req.session.destroy((error) => {
+                        return next(error);
+                    });
+
+                    return res.json({
+                        success: true,
+                        message: "User deleted successfully!",
+                        user: user
+                    });
+                }
+            });
+
         } catch (error) {
             console.error("Controller error:", error);
             return res.status(500).json({

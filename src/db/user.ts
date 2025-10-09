@@ -96,6 +96,21 @@ class User {
             throw new Error("Something went wrong when trying to update a user.");
         }
     }
+
+    async deleteUser(id: string | number): Promise<UserType> {
+        try {
+            const user = await this.prisma.user.delete({
+                where: {
+                    id: Number(id),
+                },
+            });
+
+            return user;
+        } catch (error) {
+            console.error("Prisma error:", error);
+            throw new Error("Something went wrong when trying to delete a user.");
+        }
+    }
 }
 
 export default new User(process.env.NODE_ENV === "test" ? test_client : client);

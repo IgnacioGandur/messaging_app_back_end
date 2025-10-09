@@ -82,5 +82,33 @@ describe("Users Route.", () => {
         expect(response.body.errors[1].msg).toBe("The last name field should only contain letters.");
         expect(response.body.errors[2].msg).toBe("The username field can only contain letters, numbers, dots and hyphens.");
         expect(response.body.errors[3].msg).toBe("The password should be at least 5 characters long.");
-    })
+    });
+
+    it("DELETE | Should delete a user.", async () => {
+        const agent = supertest.agent(app);
+
+        await agent
+            .post("/auth/register")
+            .type("form")
+            .send({
+                username: "Ignacio",
+                password: "bla",
+                confirmPassword: "bla"
+            })
+            .expect(200);
+
+        const user = await getTestUser("Ignacio");
+
+        const response = await agent
+            .delete(`/users/${user?.id}`)
+            .expect(200);
+
+        expect(response.body.success).toBe(true);
+        expect(response.body.message).toBe("User deleted successfully!");
+        expect("user" in response.body).toBe(true);
+
+        const userAfterDeletion = await getTestUser("Ignacio");
+
+        expect(userAfterDeletion).toBe(null);
+    });
 });
