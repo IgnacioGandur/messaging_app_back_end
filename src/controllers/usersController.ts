@@ -24,7 +24,7 @@ const usersController = {
     get: async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const user = await userModel.getUserById(id, false);
+            const user = await userModel.getUserById(id, true);
             return res.json({
                 success: true,
                 message: "User retrieved successfully!",

@@ -4,6 +4,16 @@ import { type PrismaClient, type User as UserType, Prisma } from "../generated/p
 
 type UserWithoutPassword = Omit<Prisma.UserGetPayload<{}>, "password">;
 
+type LoggedUser = Prisma.UserGetPayload<{
+    include: {
+        participants: {
+            include: {
+                conversation: true
+            }
+        }
+    }
+}>;
+
 type UpdatableFields = {
     [key: string]: any;
 };
