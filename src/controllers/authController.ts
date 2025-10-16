@@ -3,15 +3,24 @@ import bcrypt from "bcryptjs";
 import { type Request, Response, NextFunction } from "express";
 
 const authController = {
-    register: async (req: Request<{}, {}, { username: string; password: string; }>, res: Response, next: NextFunction) => {
+    register: async (req: Request<{}, {}, { username: string; password: string; firstName: string; lastName: string; }>, res: Response, next: NextFunction) => {
         try {
             const {
+                firstName,
+                lastName,
                 username,
                 password
             } = req.body;
 
+            const profilePictureUrl = `https://ui-avatars.com/api/?name=${firstName}+${lastName}&background=random&color=fff`;
             const hashedPassword = await bcrypt.hash(password, 10);
-            const user = await userModel.createUser(username, hashedPassword);
+            const user = await userModel.createUser(
+                firstName,
+                lastName,
+                username,
+                profilePictureUrl,
+                hashedPassword
+            );
 
             req.login(user, (error) => {
                 if (error) {

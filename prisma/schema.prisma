@@ -22,16 +22,17 @@ model Session {
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  username     String        @unique @db.VarChar(30)
-  password     String
-  firstName    String?       @db.VarChar(30)
-  lastName     String?       @db.VarChar(30)
-  joinedOn     DateTime      @default(now())
-  messages     Message[]     @relation("UserMessages")
-  participants Participant[]
-  friendsA     Friendship[]  @relation("UserAFriends")
-  friendsB     Friendship[]  @relation("UserBFriends")
+  id                Int           @id @default(autoincrement())
+  username          String        @unique @db.VarChar(30)
+  password          String
+  firstName         String        @db.VarChar(30)
+  lastName          String        @db.VarChar(30)
+  profilePictureUrl String
+  joinedOn          DateTime      @default(now())
+  messages          Message[]     @relation("UserMessages")
+  participants      Participant[]
+  friendsA          Friendship[]  @relation("UserAFriends")
+  friendsB          Friendship[]  @relation("UserBFriends")
 }
 
 model Friendship {

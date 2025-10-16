@@ -1,12 +1,22 @@
 import { Router } from "express";
 import conversationsController from "../controllers/conversationsController.js";
+import isAuthenticated from "../middlewares/isAuthenticated.js";
+import validatePrivateConversationCreation from "../middlewares/validators/conversations/validatePrivateConversationCreation.js";
 
 const conversationsRouter = Router();
 
 conversationsRouter
     .route("/")
-    .get(conversationsController.get)
-    .post(conversationsController.create);
+    .all(isAuthenticated)
+    .get(conversationsController.getUserConversations)
+    .post(
+        validatePrivateConversationCreation,
+        conversationsController.createPrivateConversation
+    );
+
+conversationsRouter
+    .route("/:id")
+    .get(conversationsController.getPrivateConversation);
 
 export default conversationsRouter;
 

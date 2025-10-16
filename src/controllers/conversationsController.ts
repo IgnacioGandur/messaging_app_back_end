@@ -2,20 +2,31 @@ import { Request, Response } from "express";
 import conversationModel from "../db/conversation.js";
 
 const conversationsController = {
-    get: async (req: Request, res: Response) => {
-        const { id } = req.user as { id: number };
+    getPrivateConversation: async (req: Request, res: Response) => {
+        const { id: conversationId } = req.params;
 
-        const conversations = await conversationModel.get(id);
-        console.log("The content of conversations is:", conversations);
+        const conversation = await conversationModel.getPrivateConversationById(conversationId);
 
         return res.json({
             success: true,
-            message: "hello",
+            message: "Private conversation retrieved successfully!",
+            conversation
+        });
+    },
+
+    getUserConversations: async (req: Request, res: Response) => {
+        const { id } = req.user as { id: number };
+
+        const conversations = await conversationModel.getAllUserPrivateConversations(id);
+
+        return res.json({
+            success: true,
+            message: "User conversations retrieved successfully!",
             conversations
         });
     },
 
-    create: async (req: Request, res: Response) => {
+    createPrivateConversation: async (req: Request, res: Response) => {
         try {
             const { id: userAId } = req.user as { id: number };
             const {
@@ -23,11 +34,11 @@ const conversationsController = {
                 message
             } = req.body;
 
-            const conversation = await conversationModel.get(userAId, userBId);
+            const conversation = await conversationModel.getPrivateConversation(userAId, userBId);
 
+            // if there's no conversation start a new one.
             if (!conversation) {
-                // if there's no conversation start a new one.
-                const newConversation = await conversationModel.create(userAId, userBId, message);
+                const newConversation = await conversationModel.createPrivateConversation(userAId, userBId, message);
                 return res.json({
                     success: true,
                     message: "Conversation created successfully!",

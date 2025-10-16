@@ -45,7 +45,7 @@ const usersController = {
             const {
                 firstName,
                 lastName,
-                username,
+                profilePictureUrl,
                 password
             } = req.body;
 
@@ -58,7 +58,7 @@ const usersController = {
             const fieldsToUpdate = cleanEmptyFields({
                 firstName,
                 lastName,
-                username,
+                profilePictureUrl,
                 password: password ? hashedPass : password
             });
 

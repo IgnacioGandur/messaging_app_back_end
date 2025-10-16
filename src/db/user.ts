@@ -4,16 +4,6 @@ import { type PrismaClient, type User as UserType, Prisma } from "../generated/p
 
 type UserWithoutPassword = Omit<Prisma.UserGetPayload<{}>, "password">;
 
-type LoggedUser = Prisma.UserGetPayload<{
-    include: {
-        participants: {
-            include: {
-                conversation: true
-            }
-        }
-    }
-}>;
-
 type UpdatableFields = {
     [key: string]: any;
 };
@@ -25,11 +15,20 @@ class User {
         this.prisma = prisma;
     }
 
-    async createUser(username: string, password: string): Promise<UserType> {
+    async createUser(
+        firstName: string,
+        lastName: string,
+        username: string,
+        profilePictureUrl: string,
+        password: string
+    ): Promise<UserType> {
         try {
             const user = await this.prisma.user.create({
                 data: {
+                    firstName,
+                    lastName,
                     username,
+                    profilePictureUrl,
                     password,
                 }
             });

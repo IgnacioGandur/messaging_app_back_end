@@ -1,11 +1,20 @@
-import { body, Meta } from "express-validator";
+import { body, param } from "express-validator";
 import validateChain from "../validateChain.js";
-import checkIfUsernameIsAlreadyTaken from "../auth/register/custom-validators/checkIfUsernameIsAlreadyTaken.js";
 import checkIfPasswordsMatch from "../auth/register/custom-validators/checkIfPasswordsMatch.js";
-
-const regex = /^[\w.-]{1,30}$/;
+import checkIfUrlPointsToImage from "./custom-validators/checkIfUrlPointsToImage.js";
+import checkIfUserIsAccountOwner from "./custom-validators/checkIfUserIsAccountOwner.js";
 
 const validationChain = [
+    param("id")
+        .trim()
+        .notEmpty()
+        .withMessage("The user id in the param can't be empty.")
+        .bail()
+        .isInt()
+        .withMessage("The user id in the param should be an integer.")
+        .bail()
+        .custom(checkIfUserIsAccountOwner)
+    ,
     body("firstName")
         .optional({ values: "falsy" })
         .trim()
@@ -22,16 +31,15 @@ const validationChain = [
         .isLength({ min: 1, max: 30 })
         .withMessage("The last name field should be between 1 and 30 characters long.")
     ,
-    body("username")
-        .if((username, { req }) => username !== req.user.username)
-        .optional({ values: "falsy" })
+    body("profilePictureUrl")
         .trim()
-        .isLength({ min: 3, max: 30 })
-        .withMessage("The username field should be between 3 and 30 characters long.")
-        .matches(regex)
-        .withMessage("The username field can only contain letters, numbers, dots and hyphens.")
+        .notEmpty()
+        .withMessage("The profile picture URL field can't be empty.")
+        .isURL()
+        .withMessage("The profile picture URL field should be a URL.")
         .bail()
-        .custom(checkIfUsernameIsAlreadyTaken),
+        .custom(checkIfUrlPointsToImage)
+    ,
     body("password")
         .optional({ values: "falsy" })
         .trim()

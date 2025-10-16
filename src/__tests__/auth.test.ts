@@ -14,7 +14,9 @@ describe("Auth Router", () => {
             .post("/auth/register")
             .type("form")
             .send({
-                username: "Ignacio",
+                firstName: "john",
+                lastName: "doe",
+                username: "john_doe",
                 password: "bla",
                 confirmPassword: "bla"
             })
@@ -23,7 +25,7 @@ describe("Auth Router", () => {
         expect(response.body.success).toBe(true);
         expect(response.body.message).toBe("User registered successfully!");
         expect("user" in response.body).toBe(true);
-        expect(response.body.user.username).toBe("Ignacio");
+        expect(response.body.user.username).toBe("john_doe");
     });
 
     it("POST | Should fail registering a new user due to bad inputs.", async () => {
@@ -31,7 +33,9 @@ describe("Auth Router", () => {
             .post("/auth/register")
             .type("form")
             .send({
-                username: "Ignacio",
+                firstName: "john",
+                lastName: "doe",
+                username: "john_doe",
                 password: "bla",
                 confirmPassword: "bla"
             })
@@ -41,7 +45,9 @@ describe("Auth Router", () => {
             .post("/auth/register")
             .type("form")
             .send({
-                username: "Ignacio",
+                firstName: "john",
+                lastName: "doe",
+                username: "john_doe",
                 password: "bla",
                 confirmPassword: "ble"
             })
@@ -50,13 +56,18 @@ describe("Auth Router", () => {
         expect(response.body.success).toBe(false);
         expect(response.body.message).toBe("There's something wrong with the following inputs, please correct them:");
         expect("errors" in response.body).toBe(true);
-        expect(response.body.errors.some((obj: { msg: string; }) => obj.msg === "The username: 'Ignacio' is already taken.")).toBe(true);
+        expect(response.body.errors.some((obj: { msg: string; }) => obj.msg === "The username: 'john_doe' is already taken.")).toBe(true);
         expect(response.body.errors.some((obj: { msg: string; }) => obj.msg === "The password and the confirm password fields don't match.")).toBe(true);
     });
 
     it("POST | Should successfully login.", async () => {
 
-        await createTestUser("Ignacio", "bla");
+        await createTestUser(
+            "john_doe",
+            "john",
+            "doe",
+            "bla"
+        );
 
         const agent = supertest.agent(app);
 
@@ -64,7 +75,7 @@ describe("Auth Router", () => {
             .post("/auth/login")
             .type("form")
             .send({
-                username: "Ignacio",
+                username: "john_doe",
                 password: "bla"
             })
             .expect(200)
@@ -82,28 +93,25 @@ describe("Auth Router", () => {
     });
 
     it("POST | Should fail to log in due to bad inputs.", async () => {
-        await supertest(app)
-            .post("/auth/register")
-            .type("form")
-            .send({
-                username: "Ignacio",
-                password: "bla",
-                confirmPassword: "bla"
-            })
-            .expect(200)
+        await createTestUser(
+            "john_doe",
+            "john",
+            "doe",
+            "password",
+        );
 
         const response = await supertest(app)
             .post("/auth/login")
             .type("form")
             .send({
-                username: "RandomUser",
+                username: "non_existing_user",
                 password: ""
             })
             .expect(422);
         expect(response.body.success).toBe(false);
         expect(response.body.message).toBe("There's something wrong with the following inputs, please correct them:");
         expect("errors" in response.body).toBe(true);
-        expect(response.body.errors[0].msg).toBe("The user with the username: 'RandomUser' doesn't exist.");
+        expect(response.body.errors[0].msg).toBe("The user with the username: 'non_existing_user' doesn't exist.");
         expect(response.body.errors[1].msg).toBe("The password field can't be empty.");
     });
 
@@ -114,7 +122,9 @@ describe("Auth Router", () => {
             .post("/auth/register")
             .type("form")
             .send({
-                username: "Ignacio",
+                firstName: "john",
+                lastName: "doe",
+                username: "john_doe",
                 password: "bla",
                 confirmPassword: "bla"
             })
@@ -140,7 +150,12 @@ describe("Auth Router", () => {
 
     it("GET | Should log out the current user.", async () => {
 
-        await createTestUser("Ignacio", "bla");
+        await createTestUser(
+            "john_doe",
+            "john",
+            "doe",
+            "bla",
+        );
 
         const agent = supertest.agent(app);
 
@@ -148,7 +163,7 @@ describe("Auth Router", () => {
             .post("/auth/login")
             .type("form")
             .send({
-                username: "Ignacio",
+                username: "john_doe",
                 password: "bla"
             })
             .expect(200);
@@ -171,7 +186,9 @@ describe("Auth Router", () => {
             .post("/auth/register")
             .type("form")
             .send({
-                username: "Ignacio",
+                firstName: "john",
+                lastName: "doe",
+                username: "john_doe",
                 password: "bla",
                 confirmPassword: "bla",
             })
