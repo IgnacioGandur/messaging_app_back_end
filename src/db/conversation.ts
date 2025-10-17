@@ -1,6 +1,13 @@
 import test_client from "./test_client.js";
 import client from "./client.js";
-import { type PrismaClient } from "../generated/prisma/index.js";
+import { type PrismaClient, type Prisma, Participant } from "../generated/prisma/index.js";
+
+type ConversationWithParticipantsAndMessages = Prisma.ConversationGetPayload<{
+    include: {
+        participants: true,
+        messages: true
+    }
+}>;
 
 class Conversation {
     prisma: PrismaClient;
@@ -114,7 +121,7 @@ class Conversation {
         }
     }
 
-    async getPrivateConversationById(id: number | string) {
+    async getPrivateConversationById(id: number | string): Promise<null | ConversationWithParticipantsAndMessages> {
         try {
             const conversation = await this.prisma.conversation.findUnique({
                 where: {
@@ -131,7 +138,11 @@ class Conversation {
                             }
                         }
                     },
-                    messages: true
+                    messages: {
+                        orderBy: {
+                            createdAt: "asc"
+                        }
+                    }
                 },
             });
 

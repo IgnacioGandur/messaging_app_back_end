@@ -4,6 +4,7 @@ import indexRouter from "./indexRouter.js";
 import meRouter from "./meRouter.js";
 import usersRouter from "./usersRouter.js";
 import conversationsRouter from "./conversationsRouter.js";
+import messagesRouter from "./messagesRouter.js";
 
 const router = Router();
 
@@ -12,5 +13,6 @@ router.use("/auth", authRouter);
 router.use("/me", meRouter);
 router.use("/users", usersRouter);
 router.use("/conversations", conversationsRouter);
+router.use("/conversations/:id/messages", messagesRouter);
 
 export default router;

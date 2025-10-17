@@ -7,10 +7,18 @@ const conversationsController = {
 
         const conversation = await conversationModel.getPrivateConversationById(conversationId);
 
+        // Replace "deleted" messages if any.
+        const filteredConversation = {
+            ...conversation,
+            messages: conversation!.messages.map((m) =>
+                m.deleted ? { ...m, content: "Deleted message." } : m
+            ),
+        };
+
         return res.json({
             success: true,
             message: "Private conversation retrieved successfully!",
-            conversation
+            conversation: filteredConversation
         });
     },
 
