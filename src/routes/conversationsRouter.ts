@@ -9,7 +9,7 @@ const conversationsRouter = Router();
 conversationsRouter
     .route("/")
     .all(isAuthenticated)
-    .get(conversationsController.getUserConversations)
+    .get(conversationsController.getConversations)
     .post(
         validatePrivateConversationCreation,
         conversationsController.createPrivateConversation

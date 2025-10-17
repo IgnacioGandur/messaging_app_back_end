@@ -22,8 +22,18 @@ const conversationsController = {
         });
     },
 
-    getUserConversations: async (req: Request, res: Response) => {
+    getConversations: async (req: Request, res: Response) => {
         const { id } = req.user as { id: number };
+        const { groups } = req.query;
+
+        if (groups) {
+            const groupConversations = await conversationModel.getGroupConversations()
+            return res.json({
+                success: true,
+                message: "Groups successfully retrieved!",
+                groups: groupConversations
+            });
+        };
 
         const conversations = await conversationModel.getAllUserPrivateConversations(id);
 

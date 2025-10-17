@@ -152,6 +152,21 @@ class Conversation {
             throw new Error("Something went wrong when trying to get a conversation by it's id.");
         }
     }
+
+    async getGroupConversations() {
+        try {
+            const groups = await this.prisma.conversation.findMany({
+                where: {
+                    isGroup: true
+                },
+            });
+
+            return groups;
+        } catch (error) {
+            console.error("Prisma error:", error);
+            throw new Error("Something went wrong when trying to get group conversations.");
+        }
+    }
 }
 
 export default new Conversation(process.env.NODE_ENV === "test" ? test_client : client);
