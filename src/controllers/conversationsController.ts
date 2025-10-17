@@ -27,10 +27,18 @@ const conversationsController = {
 
         const conversations = await conversationModel.getAllUserPrivateConversations(id);
 
+        const filteredConversations = conversations.map((c) => ({
+            ...c,
+            messages: c.messages.map((m) => ({
+                ...m,
+                content: m.deleted ? "Message deleted." : m.content,
+            })),
+        }));
+
         return res.json({
             success: true,
             message: "User conversations retrieved successfully!",
-            conversations
+            conversations: filteredConversations
         });
     },
 

@@ -84,7 +84,7 @@ class Conversation {
         }
     }
 
-    async getAllUserPrivateConversations(userId: number | string) {
+    async getAllUserPrivateConversations(userId: number | string): Promise<ConversationWithParticipantsAndMessages[]> {
         try {
             const conversations = await this.prisma.conversation.findMany({
                 where: {
