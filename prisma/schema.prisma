@@ -47,6 +47,7 @@ model Friendship {
   @@unique([userAId, userBId])
 }
 
+// TODO: Add group profilePictureUrl and description.
 model Conversation {
   id           Int           @id @default(autoincrement())
   title        String?

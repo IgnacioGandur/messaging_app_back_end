@@ -84,11 +84,10 @@ class Conversation {
         }
     }
 
-    async getAllUserPrivateConversations(userId: number | string): Promise<ConversationWithParticipantsAndMessages[]> {
+    async getUserConversations(userId: number | string): Promise<ConversationWithParticipantsAndMessages[]> {
         try {
             const conversations = await this.prisma.conversation.findMany({
                 where: {
-                    isGroup: false,
                     participants: {
                         some: {
                             userId: Number(userId),
@@ -150,21 +149,6 @@ class Conversation {
         } catch (error) {
             console.error("Prisma error:", error);
             throw new Error("Something went wrong when trying to get a conversation by it's id.");
-        }
-    }
-
-    async getGroupConversations() {
-        try {
-            const groups = await this.prisma.conversation.findMany({
-                where: {
-                    isGroup: true
-                },
-            });
-
-            return groups;
-        } catch (error) {
-            console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to get group conversations.");
         }
     }
 }
