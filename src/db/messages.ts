@@ -9,7 +9,11 @@ class Message {
         this.prisma = prisma;
     }
 
-    async create(conversationId: number | string, content: string, senderId: string | number) {
+    async create(
+        conversationId: number | string,
+        content: string,
+        senderId: string | number
+    ) {
         try {
             const message = await this.prisma.message.create({
                 data: {
@@ -56,6 +60,37 @@ class Message {
         } catch (error) {
             console.error("Prisma error:", error);
             throw new Error("Something went wrong when trying to check if a message exists by it's id.");
+        }
+    }
+
+    async createWithAttachment(
+        converastionId: number | string,
+        content: string,
+        senderId: number | string,
+        fileName: string,
+        fileType: string,
+        fileUrl: string
+    ) {
+        try {
+            const message = await this.prisma.message.create({
+                data: {
+                    conversationId: Number(converastionId),
+                    content,
+                    senderId: Number(senderId),
+                    attachments: {
+                        create: {
+                            fileName,
+                            fileType,
+                            fileUrl
+                        }
+                    }
+                }
+            });
+
+            return message;
+        } catch (error) {
+            console.error("Prisma error:", error);
+            throw new Error("Something went wrong when trying to create a message with attachment.");
         }
     }
 };

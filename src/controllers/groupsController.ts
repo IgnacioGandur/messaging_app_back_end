@@ -6,8 +6,13 @@ const groupsController = {
         try {
             const { id: userId } = req.user as { id: number | string };
             const { groupName } = req.body;
+            const profilePicture = `https://ui-avatars.com/api/?name=${groupName}&background=random&color=fff`;
 
-            const group = await groupsModel.createGroup(groupName, userId);
+            const group = await groupsModel.createGroup(
+                profilePicture,
+                groupName,
+                userId,
+            );
 
             return res.json({
                 success: true,

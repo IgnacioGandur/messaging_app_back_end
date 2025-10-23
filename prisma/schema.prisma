@@ -49,12 +49,14 @@ model Friendship {
 
 // TODO: Add group profilePictureUrl and description.
 model Conversation {
-  id           Int           @id @default(autoincrement())
-  title        String?
-  isGroup      Boolean       @default(false)
-  createdAt    DateTime      @default(now())
-  messages     Message[]
-  participants Participant[]
+  id             Int           @id @default(autoincrement())
+  title          String?
+  profilePicture String?
+  description    String?
+  isGroup        Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  messages       Message[]
+  participants   Participant[]
 }
 
 model Participant {
@@ -84,6 +86,7 @@ model Message {
 model Attachment {
   id         Int      @id @default(autoincrement())
   messageId  Int
+  fileName   String
   fileUrl    String
   fileType   String
   uploadedAt DateTime @default(now())

@@ -124,7 +124,6 @@ class Conversation {
         try {
             const conversation = await this.prisma.conversation.findUnique({
                 where: {
-                    isGroup: false,
                     id: Number(id),
                 },
                 include: {
@@ -138,6 +137,10 @@ class Conversation {
                         }
                     },
                     messages: {
+                        include: {
+                            attachments: true,
+                            sender: true,
+                        },
                         orderBy: {
                             createdAt: "asc"
                         }

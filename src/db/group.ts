@@ -9,11 +9,16 @@ class Group {
         this.prisma = prisma;
     }
 
-    async createGroup(name: string, userId: string | number) {
+    async createGroup(
+        profilePictureUrl: string,
+        name: string,
+        userId: string | number,
+    ) {
         try {
             const group = await this.prisma.conversation.create({
                 data: {
                     isGroup: true,
+                    profilePicture: profilePictureUrl,
                     title: name,
                     participants: {
                         create: {

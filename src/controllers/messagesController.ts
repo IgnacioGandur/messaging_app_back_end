@@ -6,7 +6,27 @@ const messagesController = {
         try {
             const { id: conversationId } = req.params;
             const { id: senderId } = req.user as { id: number };
-            const { message } = req.body;
+            const { message, file } = req.body;
+
+            if (file) {
+                const sentMessage = await messagesModel.createWithAttachment(
+                    conversationId,
+                    message,
+                    senderId,
+                    file.name,
+                    file.type,
+                    file.url
+                );
+
+                console.log(sentMessage);
+
+                return res.json({
+                    success: true,
+                    message: "Message with attachment send successfully!",
+                    sentMessage,
+                });
+            }
+
 
             const sentMessage = await messagesModel.create(
                 conversationId,

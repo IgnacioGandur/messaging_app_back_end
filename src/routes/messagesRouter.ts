@@ -14,8 +14,7 @@ messagesRouter
         validateConversationExistence,
         validateMessageToConversation,
         messagesController.sendMessage
-    )
-    ;
+    );
 
 messagesRouter
     .route("/:mid") // mid = Message id.
