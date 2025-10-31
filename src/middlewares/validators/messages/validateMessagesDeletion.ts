@@ -1,7 +1,7 @@
 import { param } from "express-validator";
 import validateChain from "../validateChain.js";
 import checkIfMessageExistsById from "./custom-validators/checkIfMessageExistsById.js";
-import checkIfUserIsMessageOwner from "./custom-validators/checkIfUserIsMessageOwner.js";
+import checkIfUserCanDeleteMessage from "./custom-validators/checkIfUserCanDeleteMessage.js";
 
 const validationChain = [
     param("mid")
@@ -13,7 +13,7 @@ const validationChain = [
         .bail()
         .custom(checkIfMessageExistsById)
         .bail()
-        .custom(checkIfUserIsMessageOwner)
+        .custom(checkIfUserCanDeleteMessage)
 ];
 
 const validateMessagesDeletion = validateChain(validationChain);

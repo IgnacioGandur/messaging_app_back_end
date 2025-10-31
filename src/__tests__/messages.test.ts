@@ -194,7 +194,6 @@ describe("Messages Router.", () => {
 
         expect(response.body.success).toBe(false);
         expect("errors" in response.body).toBe(true);
-        expect(response.body.errors.some((e: ValidationError) => e.msg === "Only the message owner can delete the message in this conversation.")).toBe(true);
-
+        expect(response.body.errors.some((e: ValidationError) => e.msg === "Only message owners, group admins or group owners can delete messages.")).toBe(true);
     });
 });

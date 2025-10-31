@@ -18,8 +18,6 @@ const messagesController = {
                     file.url
                 );
 
-                console.log(sentMessage);
-
                 return res.json({
                     success: true,
                     message: "Message with attachment send successfully!",
