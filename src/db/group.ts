@@ -137,7 +137,6 @@ class Group {
             throw new Error("Something went wrong when trying to delete a group.");
         }
     }
-
 }
 
 export default new Group(process.env.NODE_ENV === "test" ? test_client : client);
