@@ -7,6 +7,7 @@ import conversationsRouter from "./conversationsRouter.js";
 import messagesRouter from "./messagesRouter.js";
 import groupsRouter from "./groupsRouter.js";
 import groupParticipantsRouter from "./groupParticipantsRouter.js";
+import friendshipsRouter from "./friendshipsRouter.js";
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use("/conversations", conversationsRouter);
 router.use("/conversations/:id/messages", messagesRouter);
 router.use("/groups", groupsRouter);
 router.use("/groups/:id/participants", groupParticipantsRouter)
+router.use("/friendships", friendshipsRouter);
 
 export default router;
