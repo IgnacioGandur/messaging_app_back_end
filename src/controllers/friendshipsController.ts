@@ -7,6 +7,7 @@ const friendshipsController = {
             const { id: userId } = req.user as { id: number };
             const { filter } = req.query;
 
+            // NOTE: This returns received friendship requests that are PENDING for a response.
             if (filter) {
                 const friendshipRequests = await friendshipsModel.getPendingFriendships(userId);
                 return res.json({

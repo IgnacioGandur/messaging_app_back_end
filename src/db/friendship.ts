@@ -15,6 +15,7 @@ class Friendship {
         try {
             const friendships = await this.prisma.friendship.findMany({
                 where: {
+                    status: "ACCEPTED",
                     OR: [
                         {
                             userAId: Number(userId)
