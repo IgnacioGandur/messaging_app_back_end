@@ -10,6 +10,9 @@ const messagesRouter = Router({ mergeParams: true, });
 messagesRouter
     .route("/")
     .all(isAuthenticated)
+    .get(
+        messagesController.getMoreMessages
+    )
     .post(
         validateConversationExistence,
         validateMessageToConversation,

@@ -56,6 +56,7 @@ model Conversation {
   isGroup        Boolean       @default(false)
   createdAt      DateTime      @default(now())
   messages       Message[]
+  lastMessageAt  DateTime?
   participants   Participant[]
 }
 
@@ -75,6 +76,7 @@ model Message {
   conversationId Int
   senderId       Int
   content        String
+  isRead         Boolean      @default(false)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   deleted        Boolean      @default(false)

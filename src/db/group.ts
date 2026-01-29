@@ -11,7 +11,8 @@ class Group {
 
     async createGroup(
         profilePictureUrl: string,
-        name: string,
+        title: string,
+        description: string,
         userId: string | number,
     ) {
         try {
@@ -19,7 +20,8 @@ class Group {
                 data: {
                     isGroup: true,
                     profilePicture: profilePictureUrl,
-                    title: name,
+                    description,
+                    title,
                     participants: {
                         create: {
                             userId: Number(userId),
@@ -78,14 +80,21 @@ class Group {
         }
     }
 
-    async update(id: number | string, name: string) {
+    async update(
+        id: number | string,
+        title: string,
+        description: string,
+        ppf: string
+    ) {
         try {
             const group = await this.prisma.conversation.update({
                 where: {
                     id: Number(id),
                 },
                 data: {
-                    title: name,
+                    title,
+                    description,
+                    profilePicture: ppf
                 },
             });
 

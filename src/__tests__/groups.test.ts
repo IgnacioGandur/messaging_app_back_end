@@ -34,7 +34,8 @@ describe("Groups router.", () => {
             .post("/groups")
             .type("form")
             .send({
-                groupName: "first group",
+                title: "first group",
+                description: "this is the group description"
             })
             .expect(200);
 
@@ -71,7 +72,7 @@ describe("Groups router.", () => {
         expect(response.body.errors.some((e: ValidationError) => e.msg === "The group name field can't be empty.")).toBe(true);
     });
 
-    it("PATCH | Should successfully update a group's name.", async () => {
+    it("PATCH | Should successfully update a group's title.", async () => {
         const john = await createTestUser(
             "john",
             "john",
@@ -100,12 +101,14 @@ describe("Groups router.", () => {
             .patch(`/groups/${group.id}`)
             .type("form")
             .send({
-                name: "Updated group title."
+                title: "Updated group title.",
+                description: "updated group description.",
+                ppf: "https://images4.alphacoders.com/995/thumb-1920-995876.jpg"
             })
             .expect(200);
 
         expect(response.body.success).toBe(true);
-        expect(response.body.message).toBe("Group name updated successfully!");
+        expect(response.body.message).toBe("Group updated successfully!");
         expect("group" in response.body).toBe(true);
         expect(response.body.group.title).toBe("Updated group title.");
     });
@@ -142,13 +145,16 @@ describe("Groups router.", () => {
             .patch(`/groups/${group.id}`)
             .type("form")
             .send({
-                name: ""
+                title: "",
+                description: "",
+                ppf: "not valid"
             })
 
         expect(response.body.success).toBe(false);
         expect("errors" in response.body).toBe(true);
         expect(response.body.errors.some((e: ValidationError) => e.msg === "Only the owner of the group can perform this action."));
-        expect(response.body.errors.some((e: ValidationError) => e.msg === "The updated group name can't be empty."));
+        expect(response.body.errors.some((e: ValidationError) => e.msg === "The updated group title can't be empty."));
+        expect(response.body.errors.some((e: ValidationError) => e.msg === "The updated group description can't be empty."));
     });
 
     it("DELETE | Should successfully delete a group.", async () => {

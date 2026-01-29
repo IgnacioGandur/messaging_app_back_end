@@ -76,14 +76,38 @@ class User {
         }
     }
 
-    async getAllUsers(): Promise<UserWithoutPassword[]> {
+    async getAllUsers(
+        pageSize: number,
+        skip: number,
+        search: string
+    ) {
         try {
-            const users = await this.prisma.user.findMany({
-                omit: {
-                    password: true,
+            const where: Prisma.UserWhereInput = {
+                username: {
+                    contains: search,
+                    mode: "insensitive"
                 }
-            });
-            return users;
+            };
+
+            const [users, totalCount] = await this.prisma.$transaction([
+                this.prisma.user.findMany({
+                    where,
+                    omit: { password: true },
+                    skip: Number(skip),
+                    take: Number(pageSize),
+                    orderBy: {
+                        joinedOn: "desc"
+                    }
+                }),
+                this.prisma.user.count({
+                    where
+                }),
+            ]);
+
+            return {
+                users,
+                totalCount,
+            };
         } catch (error) {
             console.error("Prisma error:", error);
             throw new Error("Something went wrong when trying to get all users.");

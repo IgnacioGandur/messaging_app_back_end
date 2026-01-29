@@ -1,11 +1,14 @@
 import { Request, Response } from "express";
 import conversationModel from "../db/conversation.js";
+import messagesModel from "../db/messages.js";
 
 const conversationsController = {
     getPrivateConversation: async (req: Request, res: Response) => {
         const { id: conversationId } = req.params;
 
-        const conversation = await conversationModel.getPrivateConversationById(conversationId);
+        const conversation = await conversationModel.getPrivateConversationById(
+            conversationId,
+        );
 
         // Replace "deleted" messages if any.
         const filteredConversation = {
@@ -15,10 +18,15 @@ const conversationsController = {
             ),
         };
 
+        const messageCursorId = conversation?.messages[conversation.messages.length - 1].id;
+        const hasMore = conversation?.messages.length! > 10;
+
         return res.json({
             success: true,
             message: "Private conversation retrieved successfully!",
-            conversation: filteredConversation
+            conversation: filteredConversation,
+            messageCursorId,
+            hasMore
         });
     },
 
@@ -52,21 +60,26 @@ const conversationsController = {
 
             const conversation = await conversationModel.getPrivateConversation(userAId, userBId);
 
-            // if there's no conversation start a new one.
-            if (!conversation) {
+            if (conversation) {
+                await messagesModel.create(
+                    conversation.id,
+                    message,
+                    userAId
+                );
+
+                return res.json({
+                    success: true,
+                    message: "Conversation already exists. Message sent.",
+                    conversation
+                });
+            } else {
                 const newConversation = await conversationModel.createPrivateConversation(userAId, userBId, message);
                 return res.json({
                     success: true,
                     message: "Conversation created successfully!",
                     conversation: newConversation,
                 });
-            } else {
-                return res.json({
-                    success: false,
-                    message: "The conversation already exists.",
-                    conversation
-                });
-            };
+            }
         } catch (error) {
             console.error("Controller error:", error);
             return res.json({

@@ -10,12 +10,13 @@ class Friendship {
     };
 
     async getUserFriendships(
-        userId: number | string
+        userId: number | string,
+        filter: "ACCEPTED" | "PENDING" | undefined
     ) {
         try {
             const friendships = await this.prisma.friendship.findMany({
                 where: {
-                    status: "ACCEPTED",
+                    status: filter,
                     OR: [
                         {
                             userAId: Number(userId)
@@ -24,17 +25,13 @@ class Friendship {
                             userBId: Number(userId)
                         },
                     ]
-                },
-                include: {
-                    userA: true,
-                    userB: true,
                 }
             });
 
             return friendships;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to get your friendships.");
+            throw new Error("Something went wrong when trying to get all user friendships.");
         }
     }
 

@@ -5,12 +5,13 @@ const groupsController = {
     createGroup: async (req: Request, res: Response) => {
         try {
             const { id: userId } = req.user as { id: number | string };
-            const { groupName } = req.body;
-            const profilePicture = `https://ui-avatars.com/api/?name=${groupName}&background=random&color=fff`;
+            const { title, description } = req.body;
+            const profilePicture = `https://ui-avatars.com/api/?name=${title}&background=random&color=fff`;
 
             const group = await groupsModel.createGroup(
                 profilePicture,
-                groupName,
+                title,
+                description,
                 userId,
             );
 
@@ -68,11 +69,17 @@ const groupsController = {
     updateGroup: async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const { name } = req.body;
-            const group = await groupsModel.update(id, name);
+            const { title, description, ppf } = req.body;
+            const group = await groupsModel.update(
+                id,
+                title,
+                description,
+                ppf
+            );
+
             return res.json({
                 success: true,
-                message: "Group name updated successfully!",
+                message: "Group updated successfully!",
                 group
             });
         } catch (error) {

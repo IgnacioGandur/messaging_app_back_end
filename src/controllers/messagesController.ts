@@ -2,6 +2,51 @@ import { Request, Response } from "express";
 import messagesModel from "../db/messages.js";
 
 const messagesController = {
+    getMoreMessages: async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
+            const {
+                cursor
+            } = req.query;
+
+            const limit = 15;
+
+            const messages = await messagesModel.getMoreMessages(
+                id,
+                limit,
+                cursor as string,
+            );
+
+            // Remove deleted messagess.
+            const filteredMessages = messages.map((m) => {
+                return m.deleted ? { ...m, content: "Deleted message." } : m
+            });
+
+            // Check if the "plus one" message is present.
+            const hasMore = filteredMessages.length > limit;
+
+            // If "plus one" remove the last message.
+            const data = hasMore ? filteredMessages.slice(0, limit) : filteredMessages;
+
+            const nextCursor = hasMore ? filteredMessages[limit].id : null;
+
+            return res.json({
+                success: true,
+                message: "More messages retrieved successfully!",
+                data: {
+                    messages: data.reverse(),
+                    nextCursor,
+                    hasMore,
+                }
+            });
+        } catch (error) {
+            console.error("Controller error:", error);
+            return res.json({
+                error: true,
+                message: "Server error. We were not able to get the messages from this conversation.",
+            });
+        }
+    },
     sendMessage: async (req: Request, res: Response) => {
         try {
             const { id: conversationId } = req.params;

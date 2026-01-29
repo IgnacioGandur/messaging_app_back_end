@@ -15,17 +15,27 @@ class Message {
         senderId: string | number
     ) {
         try {
-            const message = await this.prisma.message.create({
-                data: {
-                    content,
-                    senderId: Number(senderId),
-                    conversationId: Number(conversationId)
-                }
-            });
+            const [message] = await this.prisma.$transaction([
+                this.prisma.message.create({
+                    data: {
+                        content,
+                        senderId: Number(senderId),
+                        conversationId: Number(conversationId)
+                    }
+                }),
+                this.prisma.conversation.update({
+                    where: {
+                        id: Number(conversationId)
+                    },
+                    data: {
+                        lastMessageAt: new Date(),
+                    },
+                }),
+            ]);
 
             return message;
         } catch (error) {
-            console.log("Prisma error:", error);
+            console.error("Prisma error:", error);
             throw new Error("Something went wrong when trying to create a message.");
         }
     }
@@ -64,7 +74,7 @@ class Message {
     }
 
     async createWithAttachment(
-        converastionId: number | string,
+        conversationId: number | string,
         content: string,
         senderId: number | string,
         fileName: string,
@@ -72,25 +82,64 @@ class Message {
         fileUrl: string
     ) {
         try {
-            const message = await this.prisma.message.create({
-                data: {
-                    conversationId: Number(converastionId),
-                    content,
-                    senderId: Number(senderId),
-                    attachments: {
-                        create: {
-                            fileName,
-                            fileType,
-                            fileUrl
-                        }
-                    }
-                }
-            });
+            const [message] = await this.prisma.$transaction([
+                this.prisma.message.create({
+                    data: {
+                        conversationId: Number(conversationId),
+                        content,
+                        senderId: Number(senderId),
+                        attachments: {
+                            create: {
+                                fileName,
+                                fileType,
+                                fileUrl,
+                            },
+                        },
+                    },
+                }),
+                this.prisma.conversation.update({
+                    where: {
+                        id: Number(conversationId),
+                    },
+                    data: {
+                        lastMessageAt: new Date(),
+                    },
+                }),
+            ]);
 
             return message;
         } catch (error) {
             console.error("Prisma error:", error);
             throw new Error("Something went wrong when trying to create a message with attachment.");
+        }
+    }
+
+    async getMoreMessages(
+        conversationId: number | string,
+        limit: number | string,
+        cursorId: number | string,
+    ) {
+        try {
+            const messages = await this.prisma.message.findMany({
+                where: {
+                    conversationId: Number(conversationId),
+                },
+                take: Number(limit) + 1,
+                cursor: cursorId ? { id: Number(cursorId) } : undefined,
+                skip: cursorId ? 1 : 0,
+                include: {
+                    attachments: true,
+                    sender: true,
+                },
+                orderBy: {
+                    createdAt: "desc"
+                },
+            });
+
+            return messages;
+        } catch (error) {
+            console.error("Prisma error:", error);
+            throw new Error("Something went wrong when trying to get more messages.");
         }
     }
 };
