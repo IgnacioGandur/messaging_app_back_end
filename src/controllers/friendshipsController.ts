@@ -7,12 +7,40 @@ const friendshipsController = {
             const { id: userId } = req.user as { id: number };
             const filter = req.query.filter as "ACCEPTED" | "PENDING" | undefined;
 
-            if (filter) {
+            const page = Number(req.query.page) || 1;
+            const pageSize = 10;
+            const skip = (page - 1) * pageSize;
+            const search = req.query.search as string || "";
+
+            if (filter === "PENDING") {
                 const friendshipRequests = await friendshipsModel.getPendingFriendships(userId);
                 return res.json({
                     success: true,
                     message: "Filtered friendships retrieved successfully!",
                     friendshipRequests
+                });
+            }
+
+            if (filter === "ACCEPTED") {
+                const { friends, friendsCount } = await friendshipsModel.getFriends(
+                    userId,
+                    filter,
+                    pageSize,
+                    skip,
+                    search
+                );
+
+                return res.json({
+                    success: true,
+                    message: "User friends retrieved successfully!",
+                    data: {
+                        friends,
+                        meta: {
+                            friendsCount,
+                            totalPages: Math.ceil(friendsCount / pageSize),
+                            currentPage: page,
+                        }
+                    }
                 });
             }
 

@@ -1,6 +1,6 @@
 import client from "./client.js";
 import test_client from "./test_client.js";
-import type { PrismaClient } from "../generated/prisma/client.js";
+import type { PrismaClient, Prisma } from "../generated/prisma/client.js";
 
 class Friendship {
     prisma: PrismaClient;
@@ -8,6 +8,76 @@ class Friendship {
     constructor(prisma: PrismaClient) {
         this.prisma = prisma
     };
+
+    async getFriends(
+        userId: number | string,
+        filter: "ACCEPTED",
+        pageSize: number,
+        skip: number,
+        search: string
+    ) {
+        try {
+            const where: Prisma.FriendshipWhereInput = {
+                status: filter,
+                OR: [
+                    {
+                        userAId: Number(userId),
+                        userB: {
+                            username: {
+                                contains: search,
+                                mode: "insensitive"
+                            }
+                        }
+                    },
+                    {
+                        userBId: Number(userId),
+                        userA: {
+                            username: {
+                                contains: search,
+                                mode: "insensitive"
+                            }
+                        }
+                    },
+                ],
+            };
+
+            const [friends, friendsCount] = await this.prisma.$transaction([
+                this.prisma.friendship.findMany({
+                    where,
+                    skip: Number(skip),
+                    take: Number(pageSize),
+                    orderBy: {
+                        createdAt: "desc"
+                    },
+                    include: {
+                        userA: {
+                            omit: {
+                                password: true
+                            }
+                        },
+                        userB: {
+                            omit: {
+                                password: true
+                            }
+                        }
+                    }
+                }),
+
+                this.prisma.friendship.count({
+                    where
+                })
+            ]);
+
+            return {
+                friends,
+                friendsCount
+            };
+
+        } catch (error) {
+            console.error("Prisma error:", error);
+            throw new Error("Something went wrong when trying to get the accepted friendships.");
+        }
+    }
 
     async getUserFriendships(
         userId: number | string,
