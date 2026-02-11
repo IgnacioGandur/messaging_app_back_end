@@ -1,39 +1,57 @@
 import { Request, Response } from "express";
 import conversationModel from "../db/conversation.js";
 import messagesModel from "../db/messages.js";
+import handlePrismaErrors from "../utilities/handlePrismaErrors.js";
 
 const conversationsController = {
     getPrivateConversation: async (req: Request, res: Response) => {
-        const { id: conversationId } = req.params;
+        try {
+            const { id: conversationId } = req.params;
 
-        const conversation = await conversationModel.getPrivateConversationById(
-            conversationId,
-        );
+            // const conversation = await conversationModel.getPrivateConversationById(
+            //     conversationId,
+            // );
+            const conversation = req.foundConversation;
 
-        // Replace "deleted" messages if any.
-        const filteredConversation = {
-            ...conversation,
-            messages: conversation!.messages.map((m) =>
-                m.deleted ? { ...m, content: "Deleted message." } : m
-            ),
-        };
+            if (!conversation) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Conversation not found.",
+                    errors: [{
+                        msg: `The conversation with an Id of: "${conversationId}" doesn't exist.`,
+                    }],
+                })
+            }
 
-        const messageCursorId = conversation?.messages[conversation.messages.length - 1].id;
-        const hasMore = conversation?.messages.length! > 10;
+            // Replace "deleted" messages if any.
+            const filteredConversation = {
+                ...conversation,
+                messages: conversation!.messages.map((m) =>
+                    m.deleted ? { ...m, content: "Deleted message." } : m
+                ),
+            };
 
-        return res.json({
-            success: true,
-            message: "Private conversation retrieved successfully!",
-            conversation: filteredConversation,
-            messageCursorId,
-            hasMore
-        });
+            const messageCursorId = conversation?.messages[conversation.messages.length - 1]?.id;
+            const hasMore = conversation?.messages.length! > 10;
+
+            return res.json({
+                success: true,
+                message: "Private conversation retrieved successfully!",
+                conversation: filteredConversation,
+                messageCursorId,
+                hasMore
+            });
+        } catch (error) {
+            console.error("Controller error:", error);
+            return handlePrismaErrors(error, res, "Conversation");
+        }
     },
 
     getConversations: async (req: Request, res: Response) => {
         const { id } = req.user as { id: number };
+        const search = req.query.search as string;
 
-        const conversations = await conversationModel.getUserConversations(id);
+        const { conversations, count } = await conversationModel.getUserConversations(id, search);
 
         const filteredConversations = conversations.map((c) => ({
             ...c,
@@ -46,7 +64,10 @@ const conversationsController = {
         return res.json({
             success: true,
             message: "User conversations retrieved successfully!",
-            conversations: filteredConversations
+            data: {
+                conversations: filteredConversations,
+                count
+            }
         });
     },
 

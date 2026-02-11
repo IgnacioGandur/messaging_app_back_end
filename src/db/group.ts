@@ -1,6 +1,6 @@
 import test_client from "./test_client.js";
 import client from "./client.js";
-import { PrismaClient } from "../generated/prisma/index.js";
+import { PrismaClient, Prisma } from "../generated/prisma/index.js";
 
 class Group {
     prisma: PrismaClient;
@@ -28,6 +28,12 @@ class Group {
                             role: "OWNER"
                         },
                     },
+                    messages: {
+                        create: {
+                            content: `Hello guys, welcome to my group ${title}, please keep the messages cordial!`,
+                            senderId: Number(userId)
+                        }
+                    }
                 },
             });
 
@@ -38,26 +44,71 @@ class Group {
         }
     }
 
-    async getAll() {
+    async getAll(
+        pageSize: number,
+        skip: number,
+        search: string,
+        yourGroups: boolean,
+        userId: number | string,
+        joined: boolean
+    ) {
         try {
-            const groups = await this.prisma.conversation.findMany({
-                where: {
-                    isGroup: true,
+            const where: Prisma.ConversationWhereInput = {
+                isGroup: true,
+                title: {
+                    contains: search,
+                    mode: "insensitive"
                 },
-                include: {
+                ...((yourGroups && userId) && {
                     participants: {
-                        include: {
-                            user: {
-                                omit: {
-                                    password: true
+                        some: {
+                            role: "OWNER",
+                            userId: Number(userId),
+                        }
+                    }
+                }),
+                ...((joined && userId) && {
+                    participants: {
+                        some: {
+                            userId: Number(userId),
+                            OR: [
+                                { role: "USER" },
+                                { role: "ADMIN" }
+                            ],
+                        }
+                    }
+                })
+            };
+
+            const [groups, count] = await this.prisma.$transaction([
+                this.prisma.conversation.findMany({
+                    where,
+                    skip: Number(skip),
+                    take: Number(pageSize),
+                    orderBy: {
+                        createdAt: "desc"
+                    },
+                    include: {
+                        participants: {
+                            include: {
+                                user: {
+                                    omit: {
+                                        password: true
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
+                }),
+                this.prisma.conversation.count({
+                    where
+                })
+            ]);
 
-            return groups;
+            return {
+                groups,
+                count
+            };
         } catch (error) {
             console.error("Prisma error:", error);
             throw new Error("Something went wrong when trying to get all groups.");

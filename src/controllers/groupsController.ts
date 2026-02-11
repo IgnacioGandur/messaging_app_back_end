@@ -29,14 +29,36 @@ const groupsController = {
         }
     },
 
-    getAllGroups: async (_req: Request, res: Response) => {
+    getAllGroups: async (req: Request, res: Response) => {
         try {
-            const groups = await groupsModel.getAll();
+            const { id } = req.user as { id: number };
+            const page = Number(req.query.page) || 1;
+            const search = req.query.search as string || "";
+            const pageSize = 10;
+            const skip = (page - 1) * pageSize;
+            const yourGroups = Boolean(req.query.yourGroups);
+            const joined = Boolean(req.query.joined);
+
+            const { groups, count } = await groupsModel.getAll(
+                pageSize,
+                skip,
+                search,
+                yourGroups,
+                id,
+                joined
+            );
 
             return res.json({
                 success: true,
                 message: "All groups retrieved successfully!",
-                groups,
+                data: {
+                    groups,
+                    meta: {
+                        count,
+                        totalPages: Math.ceil(count / pageSize),
+                        currentPage: page
+                    },
+                }
             });
         } catch (error) {
             console.error("Controller error:", error);

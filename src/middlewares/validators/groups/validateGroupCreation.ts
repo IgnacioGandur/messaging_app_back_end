@@ -5,7 +5,7 @@ const validationChain = [
     body("title")
         .trim()
         .notEmpty()
-        .withMessage("The group name field can't be empty."),
+        .withMessage("The group title field can't be empty."),
     body("description")
         .trim()
         .notEmpty()

@@ -22,58 +22,43 @@ class User {
         profilePictureUrl: string,
         password: string
     ): Promise<UserType> {
-        try {
-            const user = await this.prisma.user.create({
-                data: {
-                    firstName,
-                    lastName,
-                    username,
-                    profilePictureUrl,
-                    password,
-                }
-            });
+        const user = await this.prisma.user.create({
+            data: {
+                firstName,
+                lastName,
+                username,
+                profilePictureUrl,
+                password,
+            }
+        });
 
-            return user;
-        } catch (error) {
-            console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to create a new user.");
-        }
+        return user;
     }
 
     async getUserByUsername(username: string, omitPassword: boolean = false): Promise<UserWithoutPassword | UserType | null> {
-        try {
-            const user = await this.prisma.user.findUnique({
-                where: {
-                    username,
-                },
-                omit: {
-                    password: omitPassword,
-                }
-            });
+        const user = await this.prisma.user.findUnique({
+            where: {
+                username,
+            },
+            omit: {
+                password: omitPassword,
+            }
+        });
 
-            return user;
-        } catch (error) {
-            console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to get a user by it's username.");
-        }
+        return user;
     }
 
     async getUserById(id: number | string, omitPassword: boolean = false): Promise<UserType | UserWithoutPassword | null> {
-        try {
-            const user = await this.prisma.user.findUnique({
-                where: {
-                    id: Number(id),
-                },
-                omit: {
-                    password: omitPassword
-                }
-            });
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: Number(id),
+            },
+            omit: {
+                password: omitPassword
+            }
+        });
 
-            return user;
-        } catch (error) {
-            console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to get a user by it's id.");
-        }
+        return user;
     }
 
     async getAllUsers(
@@ -114,20 +99,18 @@ class User {
         }
     }
 
-    async updateUser(id: string | number, fields: UpdatableFields): Promise<UserType> {
-        try {
-            const user = await this.prisma.user.update({
-                where: {
-                    id: Number(id)
-                },
-                data: fields
-            });
+    async updateUser(
+        id: string | number,
+        fields: UpdatableFields
+    ): Promise<UserType> {
+        const user = await this.prisma.user.update({
+            where: {
+                id: Number(id)
+            },
+            data: fields
+        });
 
-            return user;
-        } catch (error) {
-            console.error("Prisma error: ", error);
-            throw new Error("Something went wrong when trying to update a user.");
-        }
+        return user;
     }
 
     async deleteUser(id: string | number): Promise<UserType> {

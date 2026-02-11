@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import userModel from "../db/user.js";
 import cleanEmptyFields from "../utilities/cleanEmptyFields.js";
 import bcrypt from "bcryptjs";
+import handlePrismaErrors from "../utilities/handlePrismaErrors.js";
 
 const usersController = {
     getAll: async (req: Request, res: Response) => {
@@ -41,7 +42,18 @@ const usersController = {
     get: async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const user = await userModel.getUserById(id, true);
+            const user = req.foundUser;
+
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: "User not found",
+                    errors: [{
+                        msg: `No user has an Id of ${id}.`
+                    }]
+                })
+            }
+
             return res.json({
                 success: true,
                 message: "User retrieved successfully!",
@@ -49,52 +61,7 @@ const usersController = {
             });
         } catch (error) {
             console.error("Controller error:", error);
-            return res.status(500).json({
-                success: false,
-                message: "Server error. We were not able to get a user by it's username.",
-            })
-        }
-    },
-
-    update: async (req: Request, res: Response) => {
-        try {
-            const { id } = req.user as { id: number | string };
-            const {
-                firstName,
-                lastName,
-                profilePictureUrl,
-                password
-            } = req.body;
-
-            let hashedPass = "";
-
-            if (password) {
-                hashedPass = await bcrypt.hash(password, 10);
-            };
-
-            const fieldsToUpdate = cleanEmptyFields({
-                firstName,
-                lastName,
-                profilePictureUrl,
-                password: password ? hashedPass : password
-            });
-
-            const updatedUser = await userModel.updateUser(
-                id,
-                fieldsToUpdate,
-            );
-
-            return res.json({
-                success: true,
-                message: "User updated successfully!",
-                updatedUser
-            });
-        } catch (error) {
-            console.error("Controller error:", error);
-            return res.status(500).json({
-                success: false,
-                message: "Server error. We were not able to update your user."
-            });
+            return handlePrismaErrors(error, res, "User");
         }
     },
 
@@ -107,9 +74,11 @@ const usersController = {
 
             req.logout((error) => {
                 if (error) {
+                    console.error("Failed when trying to logout user.");
                     return next(error);
                 } else {
                     req.session.destroy((error) => {
+                        console.error("Failed when trying destroy the user's session.");
                         return next(error);
                     });
 

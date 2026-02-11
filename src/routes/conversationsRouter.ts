@@ -17,6 +17,7 @@ conversationsRouter
 
 conversationsRouter
     .route("/:id")
+    .all(isAuthenticated)
     .get(
         validateConversationExistence,
         conversationsController.getPrivateConversation

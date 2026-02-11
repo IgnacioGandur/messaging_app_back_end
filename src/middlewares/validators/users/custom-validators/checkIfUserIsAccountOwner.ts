@@ -7,7 +7,7 @@ const checkIfUserIsAccountOwner = async (userId: string | number, { req }: Meta)
     const user = await userModel.getUserById(userId);
 
     if (user?.id !== loggedUserId) {
-        throw new Error("You are not the owner of the account your are trying to update.");
+        throw new Error("You are not the owner of the this account.");
     }
 
     return true;

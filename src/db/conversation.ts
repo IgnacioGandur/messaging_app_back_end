@@ -84,80 +84,117 @@ class Conversation {
         }
     }
 
-    async getUserConversations(userId: number | string): Promise<ConversationWithParticipantsAndMessages[]> {
+    async getUserConversations(
+        userId: number | string,
+        search: string
+    ): Promise<{
+        conversations: ConversationWithParticipantsAndMessages[],
+        count: number
+    }> {
         try {
-            const conversations = await this.prisma.conversation.findMany({
-                where: {
-                    participants: {
-                        some: {
-                            userId: Number(userId),
-                        }
-                    }
+            const where: Prisma.ConversationWhereInput = {
+                participants: {
+                    some: {
+                        userId: Number(userId)
+                    },
                 },
-                include: {
-                    participants: {
-                        include: {
-                            user: {
-                                omit: {
-                                    password: true
+                ...(search && {
+                    OR: [
+                        {
+                            title: {
+                                contains: search,
+                                mode: "insensitive"
+                            }
+                        },
+                        {
+                            participants: {
+                                some: {
+                                    user: {
+                                        username: {
+                                            contains: search,
+                                            mode: "insensitive"
+                                        }
+                                    },
+                                    NOT: {
+                                        userId: Number(userId)
+                                    }
                                 }
                             }
                         }
-                    },
-                    messages: {
-                        take: 1,
-                        orderBy: {
-                            createdAt: "desc"
-                        }
-                    }
-                },
-                orderBy: {
-                    lastMessageAt: "desc"
-                }
-            });
+                    ]
+                })
+            };
 
-            return conversations;
+            const [conversations, count] = await this.prisma.$transaction([
+                this.prisma.conversation.findMany({
+                    where,
+                    include: {
+                        participants: {
+                            include: {
+                                user: {
+                                    omit: {
+                                        password: true
+                                    }
+                                }
+                            }
+                        },
+                        messages: {
+                            take: 1,
+                            orderBy: {
+                                createdAt: "desc"
+                            }
+                        }
+                    },
+                    orderBy: {
+                        lastMessageAt: "desc"
+                    }
+                }),
+
+                this.prisma.conversation.count({
+                    where
+                }),
+            ]);
+
+            return {
+                conversations,
+                count
+            };
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to get all user's private conversation.")
+            throw new Error("Something went wrong when trying to get the user conversations.");
         }
     }
 
     async getPrivateConversationById(
         id: number | string,
     ): Promise<null | ConversationWithParticipantsAndMessages> {
-        try {
-            const conversation = await this.prisma.conversation.findUnique({
-                where: {
-                    id: Number(id),
-                },
-                include: {
-                    participants: {
-                        include: {
-                            user: {
-                                omit: {
-                                    password: true
-                                }
+        const conversation = await this.prisma.conversation.findUnique({
+            where: {
+                id: Number(id),
+            },
+            include: {
+                participants: {
+                    include: {
+                        user: {
+                            omit: {
+                                password: true
                             }
                         }
-                    },
-                    messages: {
-                        include: {
-                            attachments: true,
-                            sender: true,
-                        },
-                        orderBy: {
-                            createdAt: "desc"
-                        },
-                        take: 15 + 1,
-                    },
+                    }
                 },
-            });
-            return conversation;
-        } catch (error) {
-            console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to get a conversation by it's id.");
-        }
+                messages: {
+                    include: {
+                        attachments: true,
+                        sender: true,
+                    },
+                    orderBy: {
+                        createdAt: "desc"
+                    },
+                    take: 15 + 1,
+                },
+            },
+        });
+        return conversation;
     }
 }
 

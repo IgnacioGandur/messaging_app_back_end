@@ -3,7 +3,6 @@ import { validationResult, ValidationChain } from "express-validator";
 
 const validateChain = (
     validationChain: ValidationChain[],
-
 ): (ValidationChain | RequestHandler)[] => {
     return [
         // If the validation chain is not an array, make it into one.
