@@ -61,6 +61,74 @@ class User {
         return user;
     }
 
+    async getFullUserProfile(id: number | string) {
+        const [user, ownedGroups, friendships, joinedGroups] = await this.prisma.$transaction([
+            this.prisma.user.findUnique({
+                where: {
+                    id: Number(id)
+                },
+                omit: {
+                    password: true
+                },
+            }),
+            this.prisma.conversation.findMany({
+                where: {
+                    isGroup: true,
+                    participants: {
+                        some: {
+                            userId: Number(id),
+                            role: "OWNER"
+                        }
+                    }
+                },
+            }),
+            this.prisma.friendship.findMany({
+                where: {
+                    OR: [
+                        {
+                            userAId: Number(id),
+                        },
+                        {
+                            userBId: Number(id)
+                        }
+                    ]
+                },
+                include: {
+                    userA: {
+                        omit: {
+                            password: true
+                        }
+                    },
+                    userB: {
+                        omit: {
+                            password: true
+                        }
+                    }
+                }
+            }),
+            this.prisma.conversation.findMany({
+                where: {
+                    isGroup: true,
+                    participants: {
+                        some: {
+                            userId: Number(id),
+                            role: {
+                                not: "OWNER"
+                            }
+                        }
+                    }
+                },
+            })
+        ]);
+
+        return {
+            user,
+            ownedGroups,
+            friendships,
+            joinedGroups
+        };
+    }
+
     async getAllUsers(
         pageSize: number,
         skip: number,
@@ -113,19 +181,66 @@ class User {
         return user;
     }
 
-    async deleteUser(id: string | number): Promise<UserType> {
-        try {
-            const user = await this.prisma.user.delete({
+    async deleteUser(userId: string | number) {
+        const user = await this.prisma.$transaction(async (tx) => {
+            const ownedConversations = await tx.conversation.findMany({
                 where: {
-                    id: Number(id),
+                    ownerId: Number(userId)
                 },
+                include: {
+                    participants: {
+                        orderBy: {
+                            joinedAt: "asc"
+                        }
+                    }
+                }
             });
 
-            return user;
-        } catch (error) {
-            console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to delete a user.");
-        }
+            // Pass conversation ownership to another user before deleting the user account.
+            for (const conv of ownedConversations) {
+                if (conv.isGroup) {
+                    // New owner would be the oldest user in the conversation.
+                    const newOwner = conv.participants.find((p) => p.userId !== Number(userId));
+
+                    if (newOwner) {
+                        await tx.conversation.update({
+                            where: {
+                                id: conv.id
+                            },
+                            data: {
+                                ownerId: newOwner.userId
+                            }
+                        });
+
+                        await tx.participant.update({
+                            where: {
+                                userId_conversationId: {
+                                    userId: newOwner.userId,
+                                    conversationId: conv.id
+                                }
+                            },
+                            data: {
+                                role: "OWNER"
+                            }
+                        });
+                    } else {
+                        await tx.conversation.delete({
+                            where: {
+                                id: Number(conv.id)
+                            }
+                        })
+                    }
+                }
+            };
+
+            return await tx.user.delete({
+                where: {
+                    id: Number(userId)
+                }
+            });
+        });
+
+        return user;
     }
 }
 

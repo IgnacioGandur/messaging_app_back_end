@@ -22,17 +22,18 @@ model Session {
 }
 
 model User {
-  id                Int           @id @default(autoincrement())
-  username          String        @unique @db.VarChar(30)
-  password          String
-  firstName         String        @db.VarChar(30)
-  lastName          String        @db.VarChar(30)
-  profilePictureUrl String
-  joinedOn          DateTime      @default(now())
-  messages          Message[]     @relation("UserMessages")
-  participants      Participant[]
-  friendsA          Friendship[]  @relation("UserAFriends")
-  friendsB          Friendship[]  @relation("UserBFriends")
+  id                 Int            @id @default(autoincrement())
+  username           String         @unique @db.VarChar(30)
+  password           String
+  firstName          String         @db.VarChar(30)
+  lastName           String         @db.VarChar(30)
+  profilePictureUrl  String
+  joinedOn           DateTime       @default(now())
+  messages           Message[]      @relation("UserMessages")
+  participants       Participant[]
+  friendsA           Friendship[]   @relation("UserAFriends")
+  friendsB           Friendship[]   @relation("UserBFriends")
+  ownedConversations Conversation[] @relation("ConversationOwner")
 }
 
 model Friendship {
@@ -55,6 +56,8 @@ model Conversation {
   description    String?
   isGroup        Boolean       @default(false)
   createdAt      DateTime      @default(now())
+  ownerId        Int?
+  owner          User?         @relation("ConversationOwner", fields: [ownerId], references: [id], onDelete: SetNull)
   messages       Message[]
   lastMessageAt  DateTime?
   participants   Participant[]

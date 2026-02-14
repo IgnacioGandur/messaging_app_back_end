@@ -15,33 +15,30 @@ class Group {
         description: string,
         userId: string | number,
     ) {
-        try {
-            const group = await this.prisma.conversation.create({
-                data: {
-                    isGroup: true,
-                    profilePicture: profilePictureUrl,
-                    description,
-                    title,
-                    participants: {
-                        create: {
-                            userId: Number(userId),
-                            role: "OWNER"
-                        },
+        const group = await this.prisma.conversation.create({
+            data: {
+                lastMessageAt: new Date(),
+                ownerId: Number(userId),
+                isGroup: true,
+                profilePicture: profilePictureUrl,
+                description,
+                title,
+                participants: {
+                    create: {
+                        userId: Number(userId),
+                        role: "OWNER"
                     },
-                    messages: {
-                        create: {
-                            content: `Hello guys, welcome to my group ${title}, please keep the messages cordial!`,
-                            senderId: Number(userId)
-                        }
-                    }
                 },
-            });
+                messages: {
+                    create: {
+                        content: `Hello guys, welcome to my group ${title}, please keep the messages cordial!`,
+                        senderId: Number(userId)
+                    }
+                }
+            },
+        });
 
-            return group;
-        } catch (error) {
-            console.error("Prisma error:", error);
-            throw new Error("Something went wrong whent trying to create a group.");
-        }
+        return group;
     }
 
     async getAll(

@@ -42,9 +42,9 @@ const usersController = {
     get: async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const user = req.foundUser;
+            const data = await userModel.getFullUserProfile(id);
 
-            if (!user) {
+            if (!data) {
                 return res.status(404).json({
                     success: false,
                     message: "User not found",
@@ -57,7 +57,7 @@ const usersController = {
             return res.json({
                 success: true,
                 message: "User retrieved successfully!",
-                user
+                data
             });
         } catch (error) {
             console.error("Controller error:", error);
