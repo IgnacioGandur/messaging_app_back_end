@@ -75,6 +75,69 @@ class Participant {
             throw new Error("Something went wrong whent tryint to remove a participant from a group conversation.");
         }
     }
+
+    async leaveGroup(
+        conversationId: number | string,
+        userId: number | string
+    ) {
+        const cId = Number(conversationId);
+        const uId = Number(userId);
+
+        return await this.prisma.$transaction(async (tx) => {
+            // Get all participants from conversation.
+            const participants = await tx.participant.findMany({
+                where: {
+                    conversationId: cId,
+                },
+                orderBy: {
+                    joinedAt: "asc"
+                }
+            });
+
+            if (participants.length === 0) return null;
+
+            // Get the user leaving.
+            const userLeaving = participants.find((p) => p.userId === uId);
+
+            if (!userLeaving) throw new Error("User not in conversation.");
+
+            // Delete the conversation if the user leaving is the only one in group.
+            if (participants.length === 1) {
+                return await tx.conversation.delete({
+                    where: {
+                        id: cId
+                    }
+                })
+            };
+
+            // If user leaving group is group owner, pass ownership to next oldest user.
+            if (userLeaving.role === "OWNER") {
+                const nextOwner = participants.find(p => p.userId !== uId);
+                if (nextOwner) {
+                    await tx.participant.update({
+                        where: {
+                            userId_conversationId: {
+                                userId: nextOwner.userId,
+                                conversationId: cId
+                            }
+                        },
+                        data: {
+                            role: "OWNER"
+                        }
+                    })
+                }
+            }
+
+            return await tx.participant.delete({
+                where: {
+                    userId_conversationId: {
+                        userId: uId,
+                        conversationId: cId
+                    }
+                }
+            })
+        });
+    }
 }
 
 export default new Participant(process.env.NODE_ENV === "test" ? test_client : client);

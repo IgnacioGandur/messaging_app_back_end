@@ -33,7 +33,25 @@ const groupParticipantsController = {
     removeUserFromGroup: async (req: Request, res: Response) => {
         try {
             const { id: conversationId } = req.params;
-            const { userId } = req.body;
+            const {
+                userId,
+                isLeavingGroup
+            } = req.body;
+
+            if (isLeavingGroup) {
+                const { id } = req.user as { id: number };
+
+                const participant = await groupParticipantModel.leaveGroup(
+                    conversationId,
+                    id
+                );
+
+                return res.json({
+                    success: true,
+                    message: "Abandoned group conversation successfully!",
+                    participant
+                });
+            }
 
             const participant = await groupParticipantModel.removeParticipantFromGroup(conversationId, userId);
 

@@ -16,6 +16,6 @@ groupParticipantsRouter
     .delete(
         validateGroupParticipantDeletion,
         groupParticipantsController.removeUserFromGroup
-    )
+    );
 
 export default groupParticipantsRouter;
