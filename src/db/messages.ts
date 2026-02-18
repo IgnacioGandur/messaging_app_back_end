@@ -31,6 +31,14 @@ class Message {
                         lastMessageAt: new Date(),
                     },
                 }),
+                this.prisma.participant.updateMany({
+                    where: {
+                        conversationId: Number(conversationId)
+                    },
+                    data: {
+                        listVisible: true
+                    }
+                })
             ]);
 
             return message;
@@ -105,6 +113,14 @@ class Message {
                         lastMessageAt: new Date(),
                     },
                 }),
+                this.prisma.participant.updateMany({
+                    where: {
+                        conversationId: Number(conversationId),
+                    },
+                    data: {
+                        listVisible: true,
+                    }
+                })
             ]);
 
             return message;

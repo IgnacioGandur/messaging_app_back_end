@@ -8,9 +8,6 @@ const conversationsController = {
         try {
             const { id: conversationId } = req.params;
 
-            // const conversation = await conversationModel.getPrivateConversationById(
-            //     conversationId,
-            // );
             const conversation = req.foundConversation;
 
             if (!conversation) {

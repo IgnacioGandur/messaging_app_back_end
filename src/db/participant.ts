@@ -138,6 +138,24 @@ class Participant {
             })
         });
     }
+
+    async leavePrivateConversation(
+        conversationId: number | string,
+        userId: number | string,
+    ) {
+        return await this.prisma.participant.update({
+            where: {
+                userId_conversationId: {
+                    userId: Number(userId),
+                    conversationId: Number(conversationId),
+                }
+            },
+            data: {
+                lastDeletedAt: new Date(),
+                listVisible: false
+            }
+        });
+    }
 }
 
 export default new Participant(process.env.NODE_ENV === "test" ? test_client : client);

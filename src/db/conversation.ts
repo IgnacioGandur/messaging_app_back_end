@@ -85,39 +85,6 @@ class Conversation {
         });
 
         return conversation;
-
-        // const conversation = await this.prisma.conversation.create({
-        //     data: {
-        //         ownerId: Number(userAId),
-        //         isGroup: false,
-        //         participants: {
-        //             create: [
-        //                 { userId: Number(userAId) },
-        //                 { userId: Number(userBId) },
-        //             ]
-        //         },
-        //         messages: {
-        //             create: {
-        //                 senderId: Number(userAId),
-        //                 content: message
-        //             }
-        //         },
-        //     },
-        //     include: {
-        //         participants: {
-        //             include: {
-        //                 user: {
-        //                     omit: {
-        //                         password: true
-        //                     }
-        //                 }
-        //             }
-        //         },
-        //         messages: true
-        //     }
-        // });
-
-        // return conversation;
     }
 
     async getUserConversations(
@@ -197,35 +164,60 @@ class Conversation {
     }
 
     async getPrivateConversationById(
-        id: number | string,
+        userId: number | string,
+        conversationId: number | string,
     ): Promise<null | ConversationWithParticipantsAndMessages> {
-        const conversation = await this.prisma.conversation.findUnique({
-            where: {
-                id: Number(id),
-            },
-            include: {
-                participants: {
-                    include: {
-                        user: {
-                            omit: {
-                                password: true
-                            }
-                        }
+        return await this.prisma.$transaction(async (tx) => {
+            const uId = Number(userId);
+            const cId = Number(conversationId);
+            const participant = await tx.participant.findUnique({
+                where: {
+                    userId_conversationId: {
+                        userId: uId,
+                        conversationId: cId
                     }
                 },
-                messages: {
-                    include: {
-                        attachments: true,
-                        sender: true,
-                    },
-                    orderBy: {
-                        createdAt: "desc"
-                    },
-                    take: 15 + 1,
+                select: {
+                    lastDeletedAt: true
+                }
+            });
+
+            if (!participant) return null;
+
+            const boundaryDate = participant.lastDeletedAt || new Date(0);
+
+            return await tx.conversation.findUnique({
+                where: {
+                    id: cId
                 },
-            },
+                include: {
+                    participants: {
+                        include: {
+                            user: {
+                                omit: {
+                                    password: true
+                                }
+                            }
+                        }
+                    },
+                    messages: {
+                        where: {
+                            createdAt: {
+                                gt: boundaryDate
+                            }
+                        },
+                        include: {
+                            attachments: true,
+                            sender: true,
+                        },
+                        orderBy: {
+                            createdAt: "desc"
+                        },
+                        take: 15 + 1
+                    }
+                }
+            })
         });
-        return conversation;
     }
 }
 

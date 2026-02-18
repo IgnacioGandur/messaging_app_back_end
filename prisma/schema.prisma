@@ -66,6 +66,8 @@ model Conversation {
 model Participant {
   userId         Int
   conversationId Int
+  lastDeletedAt  DateTime?
+  listVisible    Boolean      @default(true)
   joinedAt       DateTime     @default(now())
   role           GroupRole    @default(USER)
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
