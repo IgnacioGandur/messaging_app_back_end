@@ -5,7 +5,10 @@ import conversationsModel from "../../../../db/conversation.js";
 export default async function checkIfUserCanDeleteMessage(id: number, { req }: Meta) {
     const { id: loggedUserId } = req.user;
     const { id: conversationId } = req.params as { id: number };
-    const conversation = await conversationsModel.getPrivateConversationById(conversationId);
+    const conversation = await conversationsModel.getPrivateConversationById(
+        loggedUserId,
+        conversationId
+    );
 
     const owner = conversation?.participants.find((p) => {
         return p.role === "OWNER" && p.userId === loggedUserId;
