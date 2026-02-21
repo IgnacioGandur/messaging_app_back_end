@@ -31,7 +31,7 @@ class Group {
                 },
                 messages: {
                     create: {
-                        content: `Hello guys, welcome to my group ${title}, please keep the messages cordial!`,
+                        content: `Hello guys! Welcome to my group!`,
                         senderId: Number(userId)
                     }
                 }

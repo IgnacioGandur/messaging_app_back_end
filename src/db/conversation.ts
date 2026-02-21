@@ -97,7 +97,8 @@ class Conversation {
         const where: Prisma.ConversationWhereInput = {
             participants: {
                 some: {
-                    userId: Number(userId)
+                    userId: Number(userId),
+                    listVisible: true,
                 },
             },
             ...(search && {

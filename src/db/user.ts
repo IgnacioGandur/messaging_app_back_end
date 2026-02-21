@@ -242,6 +242,68 @@ class User {
 
         return user;
     }
+
+    async getUserWithStats(
+        userId: number | string
+    ) {
+        const uId = Number(userId);
+        return await this.prisma.$transaction([
+            this.prisma.user.findUnique({
+                where: {
+                    id: uId
+                },
+                omit: {
+                    password: true
+                }
+            }),
+            this.prisma.friendship.count({
+                where: {
+                    OR: [
+                        {
+                            userAId: uId
+                        },
+                        {
+                            userBId: uId
+                        },
+                    ],
+                    status: "ACCEPTED"
+                }
+            }),
+            this.prisma.participant.count({
+                where: {
+                    listVisible: true,
+                    userId: uId,
+                    conversation: {
+                        isGroup: false
+                    }
+                }
+            }),
+            this.prisma.participant.count({
+                where: {
+                    listVisible: true,
+                    userId: uId,
+                    conversation: {
+                        isGroup: true
+                    }
+                }
+            }),
+            this.prisma.participant.count({
+                where: {
+                    role: "OWNER",
+                    listVisible: true,
+                    userId: uId,
+                    conversation: {
+                        isGroup: true
+                    }
+                }
+            }),
+            this.prisma.message.count({
+                where: {
+                    senderId: uId
+                }
+            }),
+        ]);
+    }
 }
 
 export default new User(process.env.NODE_ENV === "test" ? test_client : client);

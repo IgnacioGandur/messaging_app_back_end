@@ -5,7 +5,28 @@ import bcrypt from "bcryptjs";
 import cleanEmptyFields from "../utilities/cleanEmptyFields.js";
 
 const meController = {
-    get: (req: Request, res: Response) => {
+    get: async (req: Request, res: Response) => {
+
+        const { id } = req.user as { id: number };
+        const { includeStats } = req.query;
+
+        if (includeStats) {
+            const userStats = await userModel.getUserWithStats(id);
+
+            return res.json({
+                success: true,
+                message: "Logged user with stats retrieved successfully!",
+                user: userStats[0],
+                data: {
+                    friends: userStats[1],
+                    privateConversations: userStats[2],
+                    groupConversations: userStats[3],
+                    ownedGroups: userStats[4],
+                    sentMessages: userStats[5]
+                }
+            });
+        }
+
         return res.json({
             success: true,
             message: "Logged user info retrieved successfully!",
