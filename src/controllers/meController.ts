@@ -41,7 +41,6 @@ const meController = {
                 intent: string;
                 firstName: string,
                 lastName: string,
-                profilePictureUrl: string,
                 password: string,
                 confirmPassword: string,
             };
@@ -52,8 +51,19 @@ const meController = {
                 hashedPass = await bcrypt.hash(fields.password, 10);
             };
 
-            const { intent, confirmPassword, ...finalObject } = { ...fields, password: fields.password ? hashedPass : fields.password };
+            // Remove "intent" and "confirmPassword" from the "finalObject" object.
+            const {
+                intent,
+                confirmPassword,
+                ...finalObject
+            } = {
+                ...fields,
+                password: fields.password
+                    ? hashedPass
+                    : fields.password
+            };
 
+            // Remove null/undefined fields.
             const cleanFields = cleanEmptyFields(finalObject);
 
             const updatedUser = await userModel.updateUser(
@@ -70,6 +80,24 @@ const meController = {
             console.error("Controller error:", error);
             return handlePrismaErrors(error, res, "Logged user");
         }
+    },
+
+    put: async (req: Request, res: Response) => {
+        const { id } = req.user as { id: number };
+        const { profilePictureUrl } = req.body;
+
+        const user = await userModel.updateUser(
+            id,
+            {
+                profilePictureUrl: profilePictureUrl
+            }
+        );
+
+        return res.json({
+            success: true,
+            message: "Profile picture updated successfully!",
+            user
+        });
     },
 
     delete: async (req: Request, res: Response, next: NextFunction) => {

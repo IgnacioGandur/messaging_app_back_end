@@ -30,6 +30,9 @@ groupsRouter
         validateGroupUpdate,
         groupsController.updateGroup
     )
+    .put(
+        groupsController.put
+    )
     .delete(
         validateGroupDeletion,
         groupsController.deleteGroup

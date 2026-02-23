@@ -153,6 +153,18 @@ class Group {
         }
     }
 
+    async partialUpdate(
+        groupId: string | number,
+        fields: Pick<Prisma.ConversationUpdateInput, "profilePicture" | "title" | "description">
+    ) {
+        return await this.prisma.conversation.update({
+            where: {
+                id: Number(groupId)
+            },
+            data: fields
+        });
+    }
+
     async getById(id: string | number) {
         try {
             const group = await this.prisma.conversation.findUnique({

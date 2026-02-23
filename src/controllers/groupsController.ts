@@ -130,8 +130,23 @@ const groupsController = {
                 message: "Server error. We were not able to delete a group.",
             });
         }
-    }
+    },
 
+    put: async (req: Request, res: Response) => {
+        const { id } = req.params;
+        const { profilePictureUrl } = req.body;
+
+        const group = await groupsModel.partialUpdate(
+            id,
+            { profilePicture: profilePictureUrl }
+        );
+
+        return res.json({
+            success: true,
+            message: "Group's profile pictuer updated successfully!",
+            group,
+        });
+    }
 }
 
 export default groupsController;
