@@ -35,7 +35,10 @@ class User {
         return user;
     }
 
-    async getUserByUsername(username: string, omitPassword: boolean = false): Promise<UserWithoutPassword | UserType | null> {
+    async getUserByUsername(
+        username: string,
+        omitPassword: boolean = false
+    ) {
         const user = await this.prisma.user.findUnique({
             where: {
                 username,
@@ -303,6 +306,21 @@ class User {
                 }
             }),
         ]);
+    }
+
+    async updateField(
+        userId: number | string,
+        field: keyof Pick<Prisma.UserUpdateInput, "lastActive" | "firstName" | "lastName" | "password" | "profilePictureUrl">,
+        value: Date | string
+    ) {
+        return await this.prisma.user.update({
+            where: {
+                id: Number(userId)
+            },
+            data: {
+                [field]: value
+            }
+        });
     }
 }
 
