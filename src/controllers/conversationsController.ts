@@ -47,8 +47,9 @@ const conversationsController = {
     getConversations: async (req: Request, res: Response) => {
         const { id } = req.user as { id: number };
         const search = req.query.search as string;
+        const take = req.query.take as string;
 
-        const { conversations, count } = await conversationModel.getUserConversations(id, search);
+        const { conversations, count } = await conversationModel.getUserConversations(id, search, take);
 
         const filteredConversations = conversations.map((c) => ({
             ...c,

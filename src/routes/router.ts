@@ -25,4 +25,4 @@ router.use("/friendships", friendshipsRouter);
 
 export default router;
 
-// TODO: Move all routes to here so it's easier to read.
+// TODO: Move all routes here so it's easier to read.

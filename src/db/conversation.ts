@@ -89,7 +89,8 @@ class Conversation {
 
     async getUserConversations(
         userId: number | string,
-        search: string
+        search: string,
+        take?: string | number
     ): Promise<{
         conversations: ConversationWithParticipantsAndMessages[],
         count: number
@@ -148,13 +149,19 @@ class Conversation {
                         }
                     }
                 },
+                ...(take && {
+                    take: Number(take)
+                }),
                 orderBy: {
                     lastMessageAt: "desc"
                 }
             }),
 
             this.prisma.conversation.count({
-                where
+                where,
+                ...(take && {
+                    take: Number(take)
+                })
             }),
         ]);
 
