@@ -10,31 +10,39 @@ export const io = new Server(server, {
         origin: "http://localhost:5173",
         methods: ["GET", "POST", "PUT", "DELETE"]
     }
-})
+});
 
-const onlineUsers = new Map();
+const getAllOnlineUsers = async (io: Server) => {
+    const sockets = await io.fetchSockets();
+    return sockets
+        .map(s => s.data.user)
+        .filter(user => user !== undefined);
+};
 
 io.on("connect", async (socket) => {
-    const { userId, username, profilePictureUrl, lastActive } = socket.handshake.auth;
-
+    const { userId, profilePictureUrl, username } = socket.handshake.auth;
 
     if (userId) {
-        onlineUsers.set(socket.id, { userId, username, profilePictureUrl, lastActive });
-        io.emit("update_user_list", Array.from(onlineUsers.values()));
-        console.log(`User: ${username} is online.`);
-    };
+        socket.data.user = { userId, profilePictureUrl, username }; //Attach the user to the data.user object.
+        socket.join(userId.toString()); //Create a room for the user using it's id.
+        const allUsers = await getAllOnlineUsers(io);
+        io.emit("update_user_list", allUsers);
+    }
 
     socket.on("disconnect", async () => {
-        const user = onlineUsers.get(socket.id);
-        if (user) {
-            const date = new Date();
-            io.emit("user_disconnected", { userId: user.userId, lastActive: date });
+        const userData = { ...socket.data.user, lastActive: new Date() };
 
-            onlineUsers.delete(socket.id);
-            io.emit("update_user_list", Array.from(onlineUsers.values()));
-
-            await userModel.updateField(userId, "lastActive", new Date());
-            console.log("User disconnected: ", socket.id);
+        if (userData?.userId) {
+            const now = new Date();
+            try {
+                await userModel.updateField(userData.userId, "lastActive", now);
+                io.emit("user_disconnected", { userId: userData.userId, lastActive: now });
+            } catch (error) {
+                console.error("Failed when trying to update the 'lastActive' field when logging user out.");
+            };
         };
+
+        const allUsers = await getAllOnlineUsers(io);
+        io.emit("update_user_list", allUsers);
     });
 });
