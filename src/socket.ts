@@ -14,9 +14,18 @@ export const io = new Server(server, {
 
 const getAllOnlineUsers = async (io: Server) => {
     const sockets = await io.fetchSockets();
-    return sockets
-        .map(s => s.data.user)
-        .filter(user => user !== undefined);
+    const users = new Map();
+
+    sockets.forEach(s => {
+        const user = s.data.user;
+
+        // Prevent duplicated users if the user has more than 1 window/tab open with his profile.
+        if (user && user.userId) {
+            users.set(user.userId, user);
+        };
+    });
+
+    return Array.from(users.values());
 };
 
 io.on("connect", async (socket) => {
@@ -31,8 +40,14 @@ io.on("connect", async (socket) => {
 
     socket.on("disconnect", async () => {
         const userData = { ...socket.data.user, lastActive: new Date() };
+        if (!userData.userId) return;
 
-        if (userData?.userId) {
+        const allSockets = await io.fetchSockets();
+        const isStillConnected = allSockets.some(s => s.data.user?.userId === userData.userId);
+
+        // Update the database only when the socket disconnects 
+        // (this prevents multiple database trips if a user has multiple tabs/windows and closes them, update the db only in the last disconnection.)
+        if (!isStillConnected) {
             const now = new Date();
             try {
                 await userModel.updateField(userData.userId, "lastActive", now);
