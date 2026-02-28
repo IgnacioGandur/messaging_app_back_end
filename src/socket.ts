@@ -2,6 +2,7 @@ import app from "./app.js";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 import userModel from "../src/db/user.js";
+import registerFriendshipsHandler from "./handlers/registerFriendshipsHandler.js";
 
 export const server = createServer(app);
 
@@ -37,6 +38,8 @@ io.on("connect", async (socket) => {
         const allUsers = await getAllOnlineUsers(io);
         io.emit("update_user_list", allUsers);
     }
+
+    registerFriendshipsHandler(io, socket);
 
     socket.on("disconnect", async () => {
         const userData = { ...socket.data.user, lastActive: new Date() };

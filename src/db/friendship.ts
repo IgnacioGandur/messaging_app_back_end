@@ -114,6 +114,9 @@ class Friendship {
                 data: {
                     userAId: Number(userAId),
                     userBId: Number(userBId),
+                },
+                include: {
+                    userA: true
                 }
             });
 
@@ -152,6 +155,9 @@ class Friendship {
                 },
                 include: {
                     userA: true,
+                },
+                orderBy: {
+                    createdAt: "desc"
                 }
             });
 
@@ -174,6 +180,18 @@ class Friendship {
                 },
                 data: {
                     status,
+                },
+                include: {
+                    userA: {
+                        omit: {
+                            password: true
+                        }
+                    },
+                    userB: {
+                        omit: {
+                            password: true
+                        }
+                    },
                 }
             });
 
