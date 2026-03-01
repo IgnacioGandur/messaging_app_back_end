@@ -3,6 +3,8 @@ import { createServer } from "node:http";
 import { Server } from "socket.io";
 import userModel from "../src/db/user.js";
 import registerFriendshipsHandler from "./handlers/registerFriendshipsHandler.js";
+import registerMessagesHandler from "./handlers/registerMessagesHandler.js";
+import registerNotificationsHandler from "./handlers/registerNotificationsHandler.js";
 
 export const server = createServer(app);
 
@@ -40,6 +42,8 @@ io.on("connect", async (socket) => {
     }
 
     registerFriendshipsHandler(io, socket);
+    registerMessagesHandler(io, socket);
+    registerNotificationsHandler(io, socket);
 
     socket.on("disconnect", async () => {
         const userData = { ...socket.data.user, lastActive: new Date() };
@@ -62,5 +66,6 @@ io.on("connect", async (socket) => {
 
         const allUsers = await getAllOnlineUsers(io);
         io.emit("update_user_list", allUsers);
+        socket.leave(userData.userId);
     });
 });

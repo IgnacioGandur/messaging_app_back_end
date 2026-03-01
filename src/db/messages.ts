@@ -21,6 +21,21 @@ class Message {
                         content,
                         senderId: Number(senderId),
                         conversationId: Number(conversationId)
+                    },
+                    include: {
+                        conversation: {
+                            select: {
+                                participants: {
+                                    select: {
+                                        userId: true
+                                    }
+                                },
+                                isGroup: true,
+                                title: true,
+                                profilePicture: true
+                            },
+                        },
+                        sender: true
                     }
                 }),
                 this.prisma.conversation.update({

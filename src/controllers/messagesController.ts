@@ -47,6 +47,7 @@ const messagesController = {
             });
         }
     },
+
     sendMessage: async (req: Request, res: Response) => {
         try {
             const { id: conversationId } = req.params;
