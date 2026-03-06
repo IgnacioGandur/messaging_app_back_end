@@ -5,6 +5,7 @@ import userModel from "../src/db/user.js";
 import registerFriendshipsHandler from "./handlers/registerFriendshipsHandler.js";
 import registerMessagesHandler from "./handlers/registerMessagesHandler.js";
 import registerNotificationsHandler from "./handlers/registerNotificationsHandler.js";
+import registerConversationsHandler from "./handlers/registerConversationsHandler.js";
 
 export const server = createServer(app);
 
@@ -44,6 +45,7 @@ io.on("connect", async (socket) => {
     registerFriendshipsHandler(io, socket);
     registerMessagesHandler(io, socket);
     registerNotificationsHandler(io, socket);
+    registerConversationsHandler(io, socket);
 
     socket.on("disconnect", async () => {
         const userData = { ...socket.data.user, lastActive: new Date() };

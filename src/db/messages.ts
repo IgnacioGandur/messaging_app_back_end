@@ -23,20 +23,46 @@ class Message {
                         conversationId: Number(conversationId)
                     },
                     include: {
+                        sender: {
+                            omit: {
+                                password: true
+                            }
+                        },
                         conversation: {
-                            select: {
+                            include: {
                                 participants: {
-                                    select: {
-                                        userId: true
+                                    include: {
+                                        user: {
+                                            omit: {
+                                                password: true
+                                            }
+                                        }
                                     }
                                 },
-                                isGroup: true,
-                                title: true,
-                                profilePicture: true
-                            },
-                        },
-                        sender: true
+                                messages: {
+                                    take: 1,
+                                    orderBy: {
+                                        createdAt: "desc"
+                                    }
+                                }
+                            }
+                        }
                     }
+                    // include: {
+                    //     conversation: {
+                    //         select: {
+                    //             participants: {
+                    //                 select: {
+                    //                     userId: true
+                    //                 }
+                    //             },
+                    //             isGroup: true,
+                    //             title: true,
+                    //             profilePicture: true
+                    //         },
+                    //     },
+                    //     sender: true
+                    // }
                 }),
                 this.prisma.conversation.update({
                     where: {
@@ -119,6 +145,25 @@ class Message {
                             },
                         },
                     },
+                    include: {
+                        attachments: {
+                            select: {
+                                id: true
+                            }
+                        },
+                        conversation: {
+                            include: {
+                                participants: true
+                            }
+                        },
+                        sender: {
+                            select: {
+                                firstName: true,
+                                lastName: true,
+                                profilePictureUrl: true
+                            }
+                        }
+                    }
                 }),
                 this.prisma.conversation.update({
                     where: {

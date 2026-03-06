@@ -37,6 +37,9 @@ class Conversation {
                             }
                         },
                     ]
+                },
+                include: {
+                    participants: true,
                 }
             });
 
@@ -67,7 +70,7 @@ class Conversation {
                     create: {
                         senderId: Number(userAId),
                         content: message
-                    }
+                    },
                 },
             },
             include: {
@@ -80,7 +83,15 @@ class Conversation {
                         }
                     }
                 },
-                messages: true
+                messages: {
+                    include: {
+                        sender: {
+                            omit: {
+                                password: true
+                            }
+                        }
+                    }
+                }
             }
         });
 

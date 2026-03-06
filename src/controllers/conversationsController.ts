@@ -80,7 +80,7 @@ const conversationsController = {
             const conversation = await conversationModel.getPrivateConversation(userAId, userBId);
 
             if (conversation) {
-                await messagesModel.create(
+                const createdMessage = await messagesModel.create(
                     conversation.id,
                     message,
                     userAId
@@ -89,6 +89,7 @@ const conversationsController = {
                 return res.json({
                     success: true,
                     message: "Conversation already exists. Message sent.",
+                    createdMessage,
                     conversation
                 });
             } else {

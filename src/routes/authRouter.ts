@@ -29,11 +29,11 @@ authRouter
         authController.logout
     );
 
-authRouter
-    .route("/protected-route")
-    .all(
-        isAuthenticated,
-        authController.protectedRoute
-    );
+// authRouter
+//     .route("/protected-route")
+//     .all(
+//         isAuthenticated,
+//         authController.protectedRoute
+//     );
 
 export default authRouter;

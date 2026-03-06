@@ -1,5 +1,11 @@
 import { Server, Socket } from "socket.io";
 import { MessagePayload } from "./registerMessagesHandler.js";
+import { Conversation, Participant } from "../generated/prisma/index.js";
+
+interface ConversationPayload extends Conversation {
+    participants: Participant[];
+    recipientId: number;
+};
 
 const registerNotificationsHandler = (_io: Server, socket: Socket) => {
     const notifyMessage = (payload: MessagePayload) => {
@@ -12,7 +18,16 @@ const registerNotificationsHandler = (_io: Server, socket: Socket) => {
         });
     };
 
+    const messageFromProfile = (payload: ConversationPayload) => {
+        const { recipientId } = payload;
+
+        socket
+            .to(recipientId.toString())
+            .emit("notification:receive_message_from_profile", payload);
+    };
+
     socket.on("notification:message", notifyMessage);
+    socket.on("notification:message_from_profile", messageFromProfile);
 };
 
 export default registerNotificationsHandler;
