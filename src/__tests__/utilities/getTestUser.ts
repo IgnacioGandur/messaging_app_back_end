@@ -4,8 +4,8 @@ const getTestUser = async (username: string) => {
     try {
         const user = await test_client.user.findUnique({
             where: {
-                username
-            }
+                username,
+            },
         });
 
         return user;
@@ -13,6 +13,6 @@ const getTestUser = async (username: string) => {
         console.error("Test error:", error);
         throw new Error("Error while trying to retrieve a test user.");
     }
-}
+};
 
 export default getTestUser;

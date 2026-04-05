@@ -10,35 +10,15 @@ const groupsRouter = Router();
 
 groupsRouter
     .route("/")
-    .get(
-        groupsController.getAllGroups
-    )
-    .post(
-        isAuthenticated,
-        validateGroupCreation,
-        groupsController.createGroup
-    );
+    .get(groupsController.getAllGroups)
+    .post(isAuthenticated, validateGroupCreation, groupsController.createGroup);
 
 groupsRouter
     .route("/:id")
     .all(isAuthenticated)
-    .post(
-        validateJoiningGroup,
-        groupsController.joinGroup
-    )
-    .patch(
-        validateGroupUpdate,
-        groupsController.updateGroup
-    )
-    .put(
-        groupsController.put
-    )
-    .delete(
-        validateGroupDeletion,
-        groupsController.deleteGroup
-    )
-    ;
+    .post(validateJoiningGroup, groupsController.joinGroup)
+    .patch(validateGroupUpdate, groupsController.updateGroup)
+    .put(groupsController.put)
+    .delete(validateGroupDeletion, groupsController.deleteGroup);
 
 export default groupsRouter;
-
-

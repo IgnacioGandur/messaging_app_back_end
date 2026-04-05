@@ -6,41 +6,40 @@ type Friendship = Prisma.FriendshipSelect;
 interface Payload {
     userBId: number;
     friendship: Friendship;
-};
+}
 
-const registerFriendshipRequests = (
-    io: Server,
-    socket: Socket
-) => {
+const registerFriendshipRequests = (io: Server, socket: Socket) => {
     const sendFriendshipRequest = (payload: Payload) => {
-        io
-            .to(payload.userBId.toString())
-            .emit("friendship:received_request", payload.friendship);
+        io.to(payload.userBId.toString()).emit(
+            "friendship:received_request",
+            payload.friendship,
+        );
     };
 
     const cancelFriendship = (payload: Friendship) => {
         if (payload && payload.userBId) {
-            io
-                .to(payload.userBId.toString())
-                .emit("friendship:cancel", payload);
-        };
+            io.to(payload.userBId.toString()).emit(
+                "friendship:cancel",
+                payload,
+            );
+        }
     };
 
     const acceptFriendship = (payload: Friendship) => {
         if (payload && payload.userAId) {
-            io
-                .to(payload.userAId.toString())
-                .emit("friendship:request_accepted", payload);
-        };
+            io.to(payload.userAId.toString()).emit(
+                "friendship:request_accepted",
+                payload,
+            );
+        }
     };
 
     const removeFriendship = (payload: Friendship) => {
         if (payload && payload.userAId && payload.userBId) {
-            io
-                .to(payload.userAId.toString())
+            io.to(payload.userAId.toString())
                 .to(payload.userBId.toString())
                 .emit("friendship:remove_friend", payload);
-        };
+        }
     };
 
     socket.on("friendship:send_request", sendFriendshipRequest);

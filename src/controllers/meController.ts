@@ -6,7 +6,6 @@ import cleanEmptyFields from "../utilities/cleanEmptyFields.js";
 
 const meController = {
     get: async (req: Request, res: Response) => {
-
         const { id } = req.user as { id: number };
         const { includeStats } = req.query;
 
@@ -22,15 +21,15 @@ const meController = {
                     privateConversations: userStats[2],
                     groupConversations: userStats[3],
                     ownedGroups: userStats[4],
-                    sentMessages: userStats[5]
-                }
+                    sentMessages: userStats[5],
+                },
             });
         }
 
         return res.json({
             success: true,
             message: "Logged user info retrieved successfully!",
-            user: req.user
+            user: req.user,
         });
     },
 
@@ -39,42 +38,33 @@ const meController = {
             const { id } = req.user as { id: number };
             const fields = req.body as {
                 intent: string;
-                firstName: string,
-                lastName: string,
-                password: string,
-                confirmPassword: string,
+                firstName: string;
+                lastName: string;
+                password: string;
+                confirmPassword: string;
             };
 
             let hashedPass = "";
 
             if (fields.password) {
                 hashedPass = await bcrypt.hash(fields.password, 10);
-            };
+            }
 
             // Remove "intent" and "confirmPassword" from the "finalObject" object.
-            const {
-                intent,
-                confirmPassword,
-                ...finalObject
-            } = {
+            const { intent, confirmPassword, ...finalObject } = {
                 ...fields,
-                password: fields.password
-                    ? hashedPass
-                    : fields.password
+                password: fields.password ? hashedPass : fields.password,
             };
 
             // Remove null/undefined fields.
             const cleanFields = cleanEmptyFields(finalObject);
 
-            const updatedUser = await userModel.updateUser(
-                id,
-                cleanFields
-            );
+            const updatedUser = await userModel.updateUser(id, cleanFields);
 
             return res.json({
                 success: true,
                 message: "Your profile was updated successfully!",
-                user: updatedUser
+                user: updatedUser,
             });
         } catch (error) {
             console.error("Controller error:", error);
@@ -86,17 +76,14 @@ const meController = {
         const { id } = req.user as { id: number };
         const { profilePictureUrl } = req.body;
 
-        const user = await userModel.updateUser(
-            id,
-            {
-                profilePictureUrl: profilePictureUrl
-            }
-        );
+        const user = await userModel.updateUser(id, {
+            profilePictureUrl: profilePictureUrl,
+        });
 
         return res.json({
             success: true,
             message: "Profile picture updated successfully!",
-            user
+            user,
         });
     },
 
@@ -114,14 +101,16 @@ const meController = {
                     return next(error);
                 } else {
                     req.session.destroy((error) => {
-                        console.error("Failed when trying destroy the user's session.");
+                        console.error(
+                            "Failed when trying destroy the user's session.",
+                        );
                         return next(error);
                     });
 
                     return res.json({
                         success: true,
                         message: "User deleted successfully!",
-                        user: user
+                        user: user,
                     });
                 }
             });
@@ -129,7 +118,7 @@ const meController = {
             console.error("Controller error:", error);
             return handlePrismaErrors(error, res, "Logged user");
         }
-    }
-}
+    },
+};
 
 export default meController;

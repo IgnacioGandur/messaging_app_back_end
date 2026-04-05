@@ -7,7 +7,7 @@ const validationChain = [
     body("message")
         .trim()
         .notEmpty()
-        .withMessage("The message can't be empty.")
+        .withMessage("The message can't be empty."),
 ];
 
 const validateMessageToConversation = validateChain(validationChain);

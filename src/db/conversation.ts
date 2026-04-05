@@ -4,9 +4,9 @@ import { type PrismaClient, type Prisma } from "../generated/prisma/index.js";
 
 type ConversationWithParticipantsAndMessages = Prisma.ConversationGetPayload<{
     include: {
-        participants: true,
-        messages: true
-    }
+        participants: true;
+        messages: true;
+    };
 }>;
 
 class Conversation {
@@ -16,7 +16,10 @@ class Conversation {
         this.prisma = prisma;
     }
 
-    async getPrivateConversation(userAId: string | number, userBId: string | number) {
+    async getPrivateConversation(
+        userAId: string | number,
+        userBId: string | number,
+    ) {
         try {
             const conversation = await this.prisma.conversation.findFirst({
                 where: {
@@ -26,34 +29,36 @@ class Conversation {
                             participants: {
                                 some: {
                                     userId: Number(userAId),
-                                }
-                            }
+                                },
+                            },
                         },
                         {
                             participants: {
                                 some: {
                                     userId: Number(userBId),
-                                }
-                            }
+                                },
+                            },
                         },
-                    ]
+                    ],
                 },
                 include: {
                     participants: true,
-                }
+                },
             });
 
             return conversation;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to get a private conversation.");
+            throw new Error(
+                "Something went wrong when trying to get a private conversation.",
+            );
         }
     }
 
     async createPrivateConversation(
         userAId: string | number,
         userBId: string | number,
-        message: string
+        message: string,
     ) {
         const conversation = await this.prisma.conversation.create({
             data: {
@@ -64,12 +69,12 @@ class Conversation {
                     create: [
                         { userId: Number(userAId) },
                         { userId: Number(userBId) },
-                    ]
+                    ],
                 },
                 messages: {
                     create: {
                         senderId: Number(userAId),
-                        content: message
+                        content: message,
                     },
                 },
             },
@@ -78,21 +83,21 @@ class Conversation {
                     include: {
                         user: {
                             omit: {
-                                password: true
-                            }
-                        }
-                    }
+                                password: true,
+                            },
+                        },
+                    },
                 },
                 messages: {
                     include: {
                         sender: {
                             omit: {
-                                password: true
-                            }
-                        }
-                    }
-                }
-            }
+                                password: true,
+                            },
+                        },
+                    },
+                },
+            },
         });
 
         return conversation;
@@ -101,10 +106,10 @@ class Conversation {
     async getUserConversations(
         userId: number | string,
         search: string,
-        take?: string | number
+        take?: string | number,
     ): Promise<{
-        conversations: ConversationWithParticipantsAndMessages[],
-        count: number
+        conversations: ConversationWithParticipantsAndMessages[];
+        count: number;
     }> {
         const where: Prisma.ConversationWhereInput = {
             participants: {
@@ -118,8 +123,8 @@ class Conversation {
                     {
                         title: {
                             contains: search,
-                            mode: "insensitive"
-                        }
+                            mode: "insensitive",
+                        },
                     },
                     {
                         participants: {
@@ -127,17 +132,17 @@ class Conversation {
                                 user: {
                                     username: {
                                         contains: search,
-                                        mode: "insensitive"
-                                    }
+                                        mode: "insensitive",
+                                    },
                                 },
                                 NOT: {
-                                    userId: Number(userId)
-                                }
-                            }
-                        }
-                    }
-                ]
-            })
+                                    userId: Number(userId),
+                                },
+                            },
+                        },
+                    },
+                ],
+            }),
         };
 
         const [conversations, count] = await this.prisma.$transaction([
@@ -148,37 +153,37 @@ class Conversation {
                         include: {
                             user: {
                                 omit: {
-                                    password: true
-                                }
-                            }
-                        }
+                                    password: true,
+                                },
+                            },
+                        },
                     },
                     messages: {
                         take: 1,
                         orderBy: {
-                            createdAt: "desc"
-                        }
-                    }
+                            createdAt: "desc",
+                        },
+                    },
                 },
                 ...(take && {
-                    take: Number(take)
+                    take: Number(take),
                 }),
                 orderBy: {
-                    lastMessageAt: "desc"
-                }
+                    lastMessageAt: "desc",
+                },
             }),
 
             this.prisma.conversation.count({
                 where,
                 ...(take && {
-                    take: Number(take)
-                })
+                    take: Number(take),
+                }),
             }),
         ]);
 
         return {
             conversations,
-            count
+            count,
         };
     }
 
@@ -193,12 +198,12 @@ class Conversation {
                 where: {
                     userId_conversationId: {
                         userId: uId,
-                        conversationId: cId
-                    }
+                        conversationId: cId,
+                    },
                 },
                 select: {
-                    lastDeletedAt: true
-                }
+                    lastDeletedAt: true,
+                },
             });
 
             if (!participant) return null;
@@ -207,37 +212,39 @@ class Conversation {
 
             return await tx.conversation.findUnique({
                 where: {
-                    id: cId
+                    id: cId,
                 },
                 include: {
                     participants: {
                         include: {
                             user: {
                                 omit: {
-                                    password: true
-                                }
-                            }
-                        }
+                                    password: true,
+                                },
+                            },
+                        },
                     },
                     messages: {
                         where: {
                             createdAt: {
-                                gt: boundaryDate
-                            }
+                                gt: boundaryDate,
+                            },
                         },
                         include: {
                             attachments: true,
                             sender: true,
                         },
                         orderBy: {
-                            createdAt: "desc"
+                            createdAt: "desc",
                         },
-                        take: 15 + 1
-                    }
-                }
-            })
+                        take: 15 + 1,
+                    },
+                },
+            });
         });
     }
 }
 
-export default new Conversation(process.env.NODE_ENV === "test" ? test_client : client);
+export default new Conversation(
+    process.env.NODE_ENV === "test" ? test_client : client,
+);

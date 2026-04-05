@@ -2,12 +2,15 @@ import type { Meta } from "express-validator";
 import messagesModel from "../../../../db/messages.js";
 import conversationsModel from "../../../../db/conversation.js";
 
-export default async function checkIfUserCanDeleteMessage(id: number, { req }: Meta) {
+export default async function checkIfUserCanDeleteMessage(
+    id: number,
+    { req }: Meta,
+) {
     const { id: loggedUserId } = req.user;
     const { id: conversationId } = req.params as { id: number };
     const conversation = await conversationsModel.getPrivateConversationById(
         loggedUserId,
-        conversationId
+        conversationId,
     );
 
     const owner = conversation?.participants.find((p) => {
@@ -16,7 +19,7 @@ export default async function checkIfUserCanDeleteMessage(id: number, { req }: M
 
     const isAdmin = conversation?.participants.find((p) => {
         return p.role === "ADMIN" && p.userId === loggedUserId;
-    })
+    });
 
     const message = await messagesModel.getById(id);
 
@@ -24,7 +27,9 @@ export default async function checkIfUserCanDeleteMessage(id: number, { req }: M
 
     // If user trying to delete the message is not group owner || admin || message owner.
     if (!owner && !isAdmin && !isMessageOwner) {
-        throw new Error("Only message owners, group admins or group owners can delete messages.")
+        throw new Error(
+            "Only message owners, group admins or group owners can delete messages.",
+        );
     }
 
     return true;

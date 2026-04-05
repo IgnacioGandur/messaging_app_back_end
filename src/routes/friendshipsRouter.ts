@@ -9,27 +9,17 @@ const friendshipsRouter = Router();
 
 friendshipsRouter
     .route("/")
-    .all(
-        isAuthenticated
-    )
-    .get(
-        friendshipsController.getFriendships
-    )
-    .post(
-        validateFriendshipCreation,
-        friendshipsController.createFriendship
-    );
+    .all(isAuthenticated)
+    .get(friendshipsController.getFriendships)
+    .post(validateFriendshipCreation, friendshipsController.createFriendship);
 
 friendshipsRouter
     .route("/:id")
     .all(isAuthenticated)
     .put(
         validateFriendshipResponse,
-        friendshipsController.handleFriendshipRequest
+        friendshipsController.handleFriendshipRequest,
     )
-    .delete(
-        validateFriendshipDeletion,
-        friendshipsController.deleteFriendship
-    );
+    .delete(validateFriendshipDeletion, friendshipsController.deleteFriendship);
 
 export default friendshipsRouter;

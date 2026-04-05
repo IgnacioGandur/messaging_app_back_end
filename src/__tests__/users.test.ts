@@ -44,7 +44,8 @@ describe("Users Route.", () => {
                 lastName: "updatedDoe",
                 password: "new_pass",
                 confirmPassword: "new_pass",
-                profilePictureUrl: "https://images3.alphacoders.com/529/thumb-1920-52905.jpg"
+                profilePictureUrl:
+                    "https://images3.alphacoders.com/529/thumb-1920-52905.jpg",
             })
             .expect(200);
 
@@ -53,18 +54,15 @@ describe("Users Route.", () => {
         expect("updatedUser" in response.body).toBe(true);
         expect(response.body.updatedUser.firstName).toBe("updatedJohn");
         expect(response.body.updatedUser.lastName).toBe("updatedDoe");
-        expect(response.body.updatedUser.profilePictureUrl).toBe("https://images3.alphacoders.com/529/thumb-1920-52905.jpg");
+        expect(response.body.updatedUser.profilePictureUrl).toBe(
+            "https://images3.alphacoders.com/529/thumb-1920-52905.jpg",
+        );
     });
 
     it("PATCH | Should fail the update due to bad inputs provided.", async () => {
         const agent = supertest.agent(app);
 
-        await createTestUser(
-            "jane_doe",
-            "jane",
-            "doe",
-            "bla"
-        );
+        await createTestUser("jane_doe", "jane", "doe", "bla");
 
         await agent
             .post("/auth/register")
@@ -74,7 +72,7 @@ describe("Users Route.", () => {
                 lastName: "doe",
                 username: "john_doe",
                 password: "bla",
-                confirmPassword: "bla"
+                confirmPassword: "bla",
             })
             .expect(200);
 
@@ -86,16 +84,42 @@ describe("Users Route.", () => {
                 username: "!invalid username",
                 firstName: "invalid first name !123",
                 lastName: "!invalid last name 123",
-                password: "a"
+                password: "a",
             })
             .expect(422);
         expect(response.body.success).toBe(false);
-        expect(response.body.message).toBe("There's something wrong with the following inputs, please correct them:");
+        expect(response.body.message).toBe(
+            "There's something wrong with the following inputs, please correct them:",
+        );
         expect("errors" in response.body).toBe(true);
-        expect(response.body.errors.some((error: { msg: string }) => error.msg === "You are not the owner of the account your are trying to update.")).toBe(true);
-        expect(response.body.errors.some((error: { msg: string }) => error.msg === "The first name field should only contain letters.")).toBe(true);
-        expect(response.body.errors.some((error: { msg: string }) => error.msg === "The last name field should only contain letters.")).toBe(true);
-        expect(response.body.errors.some((error: { msg: string }) => error.msg === "The password should be at least 5 characters long.")).toBe(true);
+        expect(
+            response.body.errors.some(
+                (error: { msg: string }) =>
+                    error.msg ===
+                    "You are not the owner of the account your are trying to update.",
+            ),
+        ).toBe(true);
+        expect(
+            response.body.errors.some(
+                (error: { msg: string }) =>
+                    error.msg ===
+                    "The first name field should only contain letters.",
+            ),
+        ).toBe(true);
+        expect(
+            response.body.errors.some(
+                (error: { msg: string }) =>
+                    error.msg ===
+                    "The last name field should only contain letters.",
+            ),
+        ).toBe(true);
+        expect(
+            response.body.errors.some(
+                (error: { msg: string }) =>
+                    error.msg ===
+                    "The password should be at least 5 characters long.",
+            ),
+        ).toBe(true);
     });
 
     it("DELETE | Should delete a user.", async () => {
@@ -109,15 +133,13 @@ describe("Users Route.", () => {
                 lastName: "doe",
                 username: "john_doe",
                 password: "bla",
-                confirmPassword: "bla"
+                confirmPassword: "bla",
             })
             .expect(200);
 
         const user = await getTestUser("john_doe");
 
-        const response = await agent
-            .delete(`/users/${user?.id}`)
-            .expect(200);
+        const response = await agent.delete(`/users/${user?.id}`).expect(200);
 
         expect(response.body.success).toBe(true);
         expect(response.body.message).toBe("User deleted successfully!");
@@ -129,12 +151,7 @@ describe("Users Route.", () => {
     });
 
     it("DELETE | Should fail deleting a user account due to not being account owner.", async () => {
-        await createTestUser(
-            "john_doe",
-            "john",
-            "doe",
-            "bla",
-        );
+        await createTestUser("john_doe", "john", "doe", "bla");
 
         const agent = supertest.agent(app);
 
@@ -152,12 +169,18 @@ describe("Users Route.", () => {
 
         const user = await getTestUser("john_doe");
 
-        const response = await agent
-            .delete(`/users/${user!.id}`)
-            .expect(422);
+        const response = await agent.delete(`/users/${user!.id}`).expect(422);
         expect(response.body.success).toBe(false);
-        expect(response.body.message).toBe("There's something wrong with the following inputs, please correct them:");
+        expect(response.body.message).toBe(
+            "There's something wrong with the following inputs, please correct them:",
+        );
         expect("errors" in response.body).toBe(true);
-        expect(response.body.errors.some((error: { msg: string }) => error.msg === "You are not the owner of the account your are trying to update.")).toBe(true);
-    })
+        expect(
+            response.body.errors.some(
+                (error: { msg: string }) =>
+                    error.msg ===
+                    "You are not the owner of the account your are trying to update.",
+            ),
+        ).toBe(true);
+    });
 });

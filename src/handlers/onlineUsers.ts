@@ -1,5 +1,3 @@
-const handleOnlineUsers = () => {
-
-};
+const handleOnlineUsers = () => {};
 
 export default handleOnlineUsers;

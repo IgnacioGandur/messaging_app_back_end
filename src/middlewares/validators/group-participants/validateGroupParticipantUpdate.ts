@@ -17,8 +17,7 @@ const validationChain = [
         .bail()
         .custom(checkIfUserBelongsToGroup)
         .bail()
-        .custom(checkIfUserIsGroupOwner)
-    ,
+        .custom(checkIfUserIsGroupOwner),
     body("userId")
         .trim()
         .notEmpty()
@@ -32,7 +31,9 @@ const validationChain = [
         .notEmpty()
         .withMessage("The user participant role field can't be empty.")
         .isIn(["USER", "ADMIN"])
-        .withMessage("The participant role field can only be 'USER' or 'ADMIN'.")
+        .withMessage(
+            "The participant role field can only be 'USER' or 'ADMIN'.",
+        ),
 ];
 
 const validateGroupParticipantUpdate = validateChain(validationChain);

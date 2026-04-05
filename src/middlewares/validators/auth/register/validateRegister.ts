@@ -14,7 +14,9 @@ const validationChain = [
         .isAlpha()
         .withMessage("The first name field should only contain letters.")
         .isLength({ min: 1, max: 30 })
-        .withMessage("The first name field should be between 1 and 30 characters."),
+        .withMessage(
+            "The first name field should be between 1 and 30 characters.",
+        ),
     body("lastName")
         .trim()
         .notEmpty()
@@ -23,24 +25,30 @@ const validationChain = [
         .isAlpha()
         .withMessage("The last name field should only contain letters.")
         .isLength({ min: 1, max: 30 })
-        .withMessage("The last name field should be between 1 and 30 characters."),
+        .withMessage(
+            "The last name field should be between 1 and 30 characters.",
+        ),
     body("username")
         .trim()
         .notEmpty()
         .withMessage("The username field can't be empty.")
         .bail()
         .isLength({ min: 3, max: 30 })
-        .withMessage("The username field should be between 3 and 30 characters long.")
+        .withMessage(
+            "The username field should be between 3 and 30 characters long.",
+        )
         .bail()
         .matches(regex)
-        .withMessage("The username field can only contain letters, numbers, dots and hyphens.")
+        .withMessage(
+            "The username field can only contain letters, numbers, dots and hyphens.",
+        )
         .bail()
         .custom(checkIfUsernameIsAlreadyTaken),
     body("password")
         .trim()
         .notEmpty()
         .withMessage("The password field can't be empty.")
-        .custom(checkIfPasswordsMatch)
+        .custom(checkIfPasswordsMatch),
 ];
 
 const validateRegister = validateChain(validationChain);

@@ -5,8 +5,9 @@ type Object = {
 const cleanEmptyFields = (object: Object) => {
     return Object.fromEntries(
         Object.entries(object).filter(
-            ([, value]) => value !== "" && value !== undefined && value !== null
-        )
+            ([, value]) =>
+                value !== "" && value !== undefined && value !== null,
+        ),
     );
 };
 

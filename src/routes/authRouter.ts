@@ -7,27 +7,13 @@ import isAuthenticated from "../middlewares/isAuthenticated.js";
 
 const authRouter = Router();
 
-authRouter
-    .route("/register")
-    .post(
-        validateRegister,
-        authController.register
-    );
+authRouter.route("/register").post(validateRegister, authController.register);
 
 authRouter
     .route("/login")
-    .post(
-        validateLogin,
-        passport.authenticate("local"),
-        authController.login
-    );
+    .post(validateLogin, passport.authenticate("local"), authController.login);
 
-authRouter
-    .route("/logout")
-    .all(
-        isAuthenticated,
-        authController.logout
-    );
+authRouter.route("/logout").all(isAuthenticated, authController.logout);
 
 // authRouter
 //     .route("/protected-route")

@@ -7,4 +7,4 @@ export default async function deleteTestConversations() {
         console.error("Prisma error:", error);
         throw new Error("Not able to delete all test conversations.");
     }
-} 
+}

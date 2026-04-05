@@ -5,19 +5,17 @@ export type MessagePayload = Prisma.MessageGetPayload<{
     include: {
         conversation: {
             include: {
-                participants: true
-            }
-        }
-    }
+                participants: true;
+            };
+        };
+    };
 }>;
 
 const registerMessagesHandler = (_io: Server, socket: Socket) => {
     const sendMessage = (payload: MessagePayload) => {
         const { participants } = payload.conversation;
         participants.forEach((p) => {
-            socket
-                .to(p.userId.toString())
-                .emit("message:receive", payload);
+            socket.to(p.userId.toString()).emit("message:receive", payload);
         });
     };
 

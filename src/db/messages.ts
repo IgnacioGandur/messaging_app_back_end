@@ -12,7 +12,7 @@ class Message {
     async create(
         conversationId: number | string,
         content: string,
-        senderId: string | number
+        senderId: string | number,
     ) {
         try {
             const [message] = await this.prisma.$transaction([
@@ -20,13 +20,13 @@ class Message {
                     data: {
                         content,
                         senderId: Number(senderId),
-                        conversationId: Number(conversationId)
+                        conversationId: Number(conversationId),
                     },
                     include: {
                         sender: {
                             omit: {
-                                password: true
-                            }
+                                password: true,
+                            },
                         },
                         conversation: {
                             include: {
@@ -34,20 +34,20 @@ class Message {
                                     include: {
                                         user: {
                                             omit: {
-                                                password: true
-                                            }
-                                        }
-                                    }
+                                                password: true,
+                                            },
+                                        },
+                                    },
                                 },
                                 messages: {
                                     take: 1,
                                     orderBy: {
-                                        createdAt: "desc"
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                        createdAt: "desc",
+                                    },
+                                },
+                            },
+                        },
+                    },
                     // include: {
                     //     conversation: {
                     //         select: {
@@ -66,7 +66,7 @@ class Message {
                 }),
                 this.prisma.conversation.update({
                     where: {
-                        id: Number(conversationId)
+                        id: Number(conversationId),
                     },
                     data: {
                         lastMessageAt: new Date(),
@@ -74,18 +74,20 @@ class Message {
                 }),
                 this.prisma.participant.updateMany({
                     where: {
-                        conversationId: Number(conversationId)
+                        conversationId: Number(conversationId),
                     },
                     data: {
-                        listVisible: true
-                    }
-                })
+                        listVisible: true,
+                    },
+                }),
             ]);
 
             return message;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to create a message.");
+            throw new Error(
+                "Something went wrong when trying to create a message.",
+            );
         }
     }
 
@@ -96,14 +98,16 @@ class Message {
                     id: Number(id),
                 },
                 data: {
-                    deleted: true
-                }
+                    deleted: true,
+                },
             });
 
             return message;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to delete a message.");
+            throw new Error(
+                "Something went wrong when trying to delete a message.",
+            );
         }
     }
 
@@ -118,7 +122,9 @@ class Message {
             return message;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to check if a message exists by it's id.");
+            throw new Error(
+                "Something went wrong when trying to check if a message exists by it's id.",
+            );
         }
     }
 
@@ -128,7 +134,7 @@ class Message {
         senderId: number | string,
         fileName: string,
         fileType: string,
-        fileUrl: string
+        fileUrl: string,
     ) {
         try {
             const [message] = await this.prisma.$transaction([
@@ -148,22 +154,22 @@ class Message {
                     include: {
                         attachments: {
                             select: {
-                                id: true
-                            }
+                                id: true,
+                            },
                         },
                         conversation: {
                             include: {
-                                participants: true
-                            }
+                                participants: true,
+                            },
                         },
                         sender: {
                             select: {
                                 firstName: true,
                                 lastName: true,
-                                profilePictureUrl: true
-                            }
-                        }
-                    }
+                                profilePictureUrl: true,
+                            },
+                        },
+                    },
                 }),
                 this.prisma.conversation.update({
                     where: {
@@ -179,14 +185,16 @@ class Message {
                     },
                     data: {
                         listVisible: true,
-                    }
-                })
+                    },
+                }),
             ]);
 
             return message;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to create a message with attachment.");
+            throw new Error(
+                "Something went wrong when trying to create a message with attachment.",
+            );
         }
     }
 
@@ -208,16 +216,20 @@ class Message {
                     sender: true,
                 },
                 orderBy: {
-                    createdAt: "desc"
+                    createdAt: "desc",
                 },
             });
 
             return messages;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to get more messages.");
+            throw new Error(
+                "Something went wrong when trying to get more messages.",
+            );
         }
     }
-};
+}
 
-export default new Message(process.env.NODE_ENV === "test" ? test_client : client);
+export default new Message(
+    process.env.NODE_ENV === "test" ? test_client : client,
+);

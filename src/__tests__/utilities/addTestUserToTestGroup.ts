@@ -7,8 +7,8 @@ export default async function addTestUserToTestGroup(
     const participant = await test_client.participant.create({
         data: {
             userId,
-            conversationId: Number(groupId)
-        }
+            conversationId: Number(groupId),
+        },
     });
 
     return participant;

@@ -14,7 +14,7 @@ const validationChain = [
         .bail()
         .custom(checkIfConversationExistsById)
         .bail()
-        .custom(checkIfUserIsParticipantInConversation)
+        .custom(checkIfUserIsParticipantInConversation),
 ];
 
 const validateConversationExistence = validateChain(validationChain);

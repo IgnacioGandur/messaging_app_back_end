@@ -5,8 +5,8 @@ const indexController = {
         return res.json({
             success: true,
             message: "Index route reached!",
-        })
-    }
-}
+        });
+    },
+};
 
 export default indexController;

@@ -10,7 +10,7 @@ const validationChain = [
         .isInt()
         .withMessage("The user id in the param should be an integer.")
         .bail()
-        .custom(checkIfUserExistsById)
+        .custom(checkIfUserExistsById),
 ];
 
 const validateUserExistence = validateChain(validationChain);

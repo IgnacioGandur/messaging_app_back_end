@@ -13,8 +13,7 @@ const validationChain = [
         .isInt()
         .withMessage("The group id in the param should be an integer.")
         .bail()
-        .custom(checkIfGroupExistsById)
-    ,
+        .custom(checkIfGroupExistsById),
     body("userId")
         .trim()
         .notEmpty()
@@ -25,7 +24,7 @@ const validationChain = [
         .bail()
         .custom(checkIfUserExistsById)
         .bail()
-        .custom(checkIfUserIsGroupParticipantByUserId)
+        .custom(checkIfUserIsGroupParticipantByUserId),
 ];
 
 const validateGroupParticipantDeletion = validateChain(validationChain);

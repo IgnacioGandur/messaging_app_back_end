@@ -13,7 +13,7 @@ const validationChain = [
         .bail()
         .custom(checkIfFriendshipExistsById)
         .bail()
-        .custom(checkIfUserBelongsToFriendship)
+        .custom(checkIfUserBelongsToFriendship),
 ];
 
 const validateFriendshipDeletion = validateChain(validationChain);

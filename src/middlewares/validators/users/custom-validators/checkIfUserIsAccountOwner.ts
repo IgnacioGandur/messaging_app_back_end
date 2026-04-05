@@ -1,7 +1,10 @@
 import { Meta } from "express-validator";
 import userModel from "../../../../db/user.js";
 
-const checkIfUserIsAccountOwner = async (userId: string | number, { req }: Meta) => {
+const checkIfUserIsAccountOwner = async (
+    userId: string | number,
+    { req }: Meta,
+) => {
     const { id: loggedUserId } = req.user as { id: number };
 
     const user = await userModel.getUserById(userId);
@@ -11,6 +14,6 @@ const checkIfUserIsAccountOwner = async (userId: string | number, { req }: Meta)
     }
 
     return true;
-}
+};
 
 export default checkIfUserIsAccountOwner;

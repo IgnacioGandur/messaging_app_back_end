@@ -11,11 +11,11 @@ groupParticipantsRouter
     .put(
         validateConversationExistence,
         validateGroupParticipantUpdate,
-        groupParticipantsController.updateUserRole
+        groupParticipantsController.updateUserRole,
     )
     .delete(
         validateGroupParticipantDeletion,
-        groupParticipantsController.removeUserFromGroup
+        groupParticipantsController.removeUserFromGroup,
     );
 
 export default groupParticipantsRouter;

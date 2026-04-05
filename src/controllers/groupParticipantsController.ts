@@ -5,27 +5,25 @@ const groupParticipantsController = {
     updateUserRole: async (req: Request, res: Response) => {
         try {
             const { id: conversationId } = req.params;
-            const {
-                userId,
-                role
-            } = req.body;
+            const { userId, role } = req.body;
 
             const participant = await groupParticipantModel.updateAdminStatus(
                 conversationId,
                 userId,
-                role
+                role,
             );
 
             return res.json({
                 success: true,
                 message: "User role updated successfully!",
-                participant
+                participant,
             });
         } catch (error) {
             console.error("Controller error:", error);
             return res.status(500).json({
                 error: true,
-                message: "Server error. We were not able to update the user role.",
+                message:
+                    "Server error. We were not able to update the user role.",
             });
         }
     },
@@ -33,27 +31,28 @@ const groupParticipantsController = {
     removeUserFromGroup: async (req: Request, res: Response) => {
         try {
             const { id: conversationId } = req.params;
-            const {
-                userId,
-                isLeavingGroup
-            } = req.body;
+            const { userId, isLeavingGroup } = req.body;
 
             if (isLeavingGroup) {
                 const { id } = req.user as { id: number };
 
                 const participant = await groupParticipantModel.leaveGroup(
                     conversationId,
-                    id
+                    id,
                 );
 
                 return res.json({
                     success: true,
                     message: "Abandoned group conversation successfully!",
-                    participant
+                    participant,
                 });
             }
 
-            const participant = await groupParticipantModel.removeParticipantFromGroup(conversationId, userId);
+            const participant =
+                await groupParticipantModel.removeParticipantFromGroup(
+                    conversationId,
+                    userId,
+                );
 
             return res.json({
                 success: true,
@@ -64,7 +63,8 @@ const groupParticipantsController = {
             console.error("Controller error:", error);
             return res.status(500).json({
                 error: true,
-                message: "Server error. We were not able to remove the user from the group.",
+                message:
+                    "Server error. We were not able to remove the user from the group.",
             });
         }
     },

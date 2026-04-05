@@ -1,20 +1,21 @@
 import { Server, Socket } from "socket.io";
 import { Prisma } from "../generated/prisma/index.js";
 
-interface ConversationPayload extends Prisma.ConversationGetPayload<{
-    include: {
-        participants: {
-            include: {
-                user: {
-                    omit: {
-                        password: true
-                    }
-                }
-            }
-        },
-        messages: true
-    }
-}> { };
+interface ConversationPayload
+    extends Prisma.ConversationGetPayload<{
+        include: {
+            participants: {
+                include: {
+                    user: {
+                        omit: {
+                            password: true;
+                        };
+                    };
+                };
+            };
+            messages: true;
+        };
+    }> {}
 
 const registerConversationsHandler = (io: Server, socket: Socket) => {
     const handleConversationUpdate = (payload: ConversationPayload) => {

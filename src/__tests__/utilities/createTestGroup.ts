@@ -12,10 +12,10 @@ export default async function createTestGroup(
                 participants: {
                     create: {
                         userId: Number(creatorId),
-                        role: "OWNER"
-                    }
-                }
-            }
+                        role: "OWNER",
+                    },
+                },
+            },
         });
 
         return group;
@@ -23,4 +23,4 @@ export default async function createTestGroup(
         console.error("Test error:", error);
         throw new Error("Error while trying to create a new test group.");
     }
-};
+}

@@ -26,15 +26,15 @@ class Group {
                 participants: {
                     create: {
                         userId: Number(userId),
-                        role: "OWNER"
+                        role: "OWNER",
                     },
                 },
                 messages: {
                     create: {
                         content: `Hello guys! Welcome to my group!`,
-                        senderId: Number(userId)
-                    }
-                }
+                        senderId: Number(userId),
+                    },
+                },
             },
         });
 
@@ -47,34 +47,33 @@ class Group {
         search: string,
         yourGroups: boolean,
         userId: number | string,
-        joined: boolean
+        joined: boolean,
     ) {
         try {
             const where: Prisma.ConversationWhereInput = {
                 isGroup: true,
                 title: {
                     contains: search,
-                    mode: "insensitive"
+                    mode: "insensitive",
                 },
-                ...((yourGroups && userId) && {
-                    participants: {
-                        some: {
-                            role: "OWNER",
-                            userId: Number(userId),
-                        }
-                    }
-                }),
-                ...((joined && userId) && {
-                    participants: {
-                        some: {
-                            userId: Number(userId),
-                            OR: [
-                                { role: "USER" },
-                                { role: "ADMIN" }
-                            ],
-                        }
-                    }
-                })
+                ...(yourGroups &&
+                    userId && {
+                        participants: {
+                            some: {
+                                role: "OWNER",
+                                userId: Number(userId),
+                            },
+                        },
+                    }),
+                ...(joined &&
+                    userId && {
+                        participants: {
+                            some: {
+                                userId: Number(userId),
+                                OR: [{ role: "USER" }, { role: "ADMIN" }],
+                            },
+                        },
+                    }),
             };
 
             const [groups, count] = await this.prisma.$transaction([
@@ -83,32 +82,34 @@ class Group {
                     skip: Number(skip),
                     take: Number(pageSize),
                     orderBy: {
-                        createdAt: "desc"
+                        createdAt: "desc",
                     },
                     include: {
                         participants: {
                             include: {
                                 user: {
                                     omit: {
-                                        password: true
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                        password: true,
+                                    },
+                                },
+                            },
+                        },
+                    },
                 }),
                 this.prisma.conversation.count({
-                    where
-                })
+                    where,
+                }),
             ]);
 
             return {
                 groups,
-                count
+                count,
             };
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to get all groups.");
+            throw new Error(
+                "Something went wrong when trying to get all groups.",
+            );
         }
     }
 
@@ -132,7 +133,7 @@ class Group {
         id: number | string,
         title: string,
         description: string,
-        ppf: string
+        ppf: string,
     ) {
         try {
             const group = await this.prisma.conversation.update({
@@ -142,26 +143,31 @@ class Group {
                 data: {
                     title,
                     description,
-                    profilePicture: ppf
+                    profilePicture: ppf,
                 },
             });
 
             return group;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to update a group.");
+            throw new Error(
+                "Something went wrong when trying to update a group.",
+            );
         }
     }
 
     async partialUpdate(
         groupId: string | number,
-        fields: Pick<Prisma.ConversationUpdateInput, "profilePicture" | "title" | "description">
+        fields: Pick<
+            Prisma.ConversationUpdateInput,
+            "profilePicture" | "title" | "description"
+        >,
     ) {
         return await this.prisma.conversation.update({
             where: {
-                id: Number(groupId)
+                id: Number(groupId),
             },
-            data: fields
+            data: fields,
         });
     }
 
@@ -176,18 +182,20 @@ class Group {
                         include: {
                             user: {
                                 omit: {
-                                    password: true
-                                }
-                            }
-                        }
-                    }
-                }
+                                    password: true,
+                                },
+                            },
+                        },
+                    },
+                },
             });
 
             return group;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to get a group by it's id.");
+            throw new Error(
+                "Something went wrong when trying to get a group by it's id.",
+            );
         }
     }
 
@@ -203,9 +211,13 @@ class Group {
             return group;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to delete a group.");
+            throw new Error(
+                "Something went wrong when trying to delete a group.",
+            );
         }
     }
 }
 
-export default new Group(process.env.NODE_ENV === "test" ? test_client : client);
+export default new Group(
+    process.env.NODE_ENV === "test" ? test_client : client,
+);

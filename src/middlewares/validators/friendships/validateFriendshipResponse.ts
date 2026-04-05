@@ -19,7 +19,9 @@ const validationChain = [
         .notEmpty()
         .withMessage("The status field can't be empty")
         .isIn(["ACCEPTED"])
-        .withMessage("The only allowed value in the status field is 'ACCEPTED'.")
+        .withMessage(
+            "The only allowed value in the status field is 'ACCEPTED'.",
+        ),
 ];
 
 const validateFriendshipResponse = validateChain(validationChain);

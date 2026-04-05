@@ -6,9 +6,10 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
     } else {
         return res.status(401).json({
             success: false,
-            message: "Unauthorized. The route you are trying to reach is only for logged users."
+            message:
+                "Unauthorized. The route you are trying to reach is only for logged users.",
         });
     }
-}
+};
 
 export default isAuthenticated;

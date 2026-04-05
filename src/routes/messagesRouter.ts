@@ -5,18 +5,16 @@ import isAuthenticated from "../middlewares/isAuthenticated.js";
 import validateConversationExistence from "../middlewares/validators/conversations/validateConversationExistence.js";
 import validateMessagesDeletion from "../middlewares/validators/messages/validateMessagesDeletion.js";
 
-const messagesRouter = Router({ mergeParams: true, });
+const messagesRouter = Router({ mergeParams: true });
 
 messagesRouter
     .route("/")
     .all(isAuthenticated)
-    .get(
-        messagesController.getMoreMessages
-    )
+    .get(messagesController.getMoreMessages)
     .post(
         validateConversationExistence,
         validateMessageToConversation,
-        messagesController.sendMessage
+        messagesController.sendMessage,
     );
 
 messagesRouter
@@ -24,8 +22,7 @@ messagesRouter
     .delete(
         isAuthenticated,
         validateMessagesDeletion,
-        messagesController.deleteMessage
+        messagesController.deleteMessage,
     );
 
 export default messagesRouter;
-

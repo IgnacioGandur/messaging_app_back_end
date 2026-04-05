@@ -5,8 +5,10 @@ const deleteAllUsers = async () => {
         await test_client.user.deleteMany();
     } catch (error) {
         console.error("Prisma error:", error);
-        throw new Error("Something went wrong when trying to delete all users in the test database.");
+        throw new Error(
+            "Something went wrong when trying to delete all users in the test database.",
+        );
     }
-}
+};
 
 export default deleteAllUsers;

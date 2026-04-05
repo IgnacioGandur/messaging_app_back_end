@@ -6,15 +6,15 @@ class Friendship {
     prisma: PrismaClient;
 
     constructor(prisma: PrismaClient) {
-        this.prisma = prisma
-    };
+        this.prisma = prisma;
+    }
 
     async getFriends(
         userId: number | string,
         filter: "ACCEPTED",
         pageSize: number,
         skip: number,
-        search: string
+        search: string,
     ) {
         try {
             const where: Prisma.FriendshipWhereInput = {
@@ -25,18 +25,18 @@ class Friendship {
                         userB: {
                             username: {
                                 contains: search,
-                                mode: "insensitive"
-                            }
-                        }
+                                mode: "insensitive",
+                            },
+                        },
                     },
                     {
                         userBId: Number(userId),
                         userA: {
                             username: {
                                 contains: search,
-                                mode: "insensitive"
-                            }
-                        }
+                                mode: "insensitive",
+                            },
+                        },
                     },
                 ],
             };
@@ -47,41 +47,42 @@ class Friendship {
                     skip: Number(skip),
                     take: Number(pageSize),
                     orderBy: {
-                        createdAt: "desc"
+                        createdAt: "desc",
                     },
                     include: {
                         userA: {
                             omit: {
-                                password: true
-                            }
+                                password: true,
+                            },
                         },
                         userB: {
                             omit: {
-                                password: true
-                            }
-                        }
-                    }
+                                password: true,
+                            },
+                        },
+                    },
                 }),
 
                 this.prisma.friendship.count({
-                    where
-                })
+                    where,
+                }),
             ]);
 
             return {
                 friends,
-                friendsCount
+                friendsCount,
             };
-
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to get the accepted friendships.");
+            throw new Error(
+                "Something went wrong when trying to get the accepted friendships.",
+            );
         }
     }
 
     async getUserFriendships(
         userId: number | string,
-        filter: "ACCEPTED" | "PENDING" | undefined
+        filter: "ACCEPTED" | "PENDING" | undefined,
     ) {
         try {
             const friendships = await this.prisma.friendship.findMany({
@@ -89,26 +90,25 @@ class Friendship {
                     status: filter,
                     OR: [
                         {
-                            userAId: Number(userId)
+                            userAId: Number(userId),
                         },
                         {
-                            userBId: Number(userId)
+                            userBId: Number(userId),
                         },
-                    ]
-                }
+                    ],
+                },
             });
 
             return friendships;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to get all user friendships.");
+            throw new Error(
+                "Something went wrong when trying to get all user friendships.",
+            );
         }
     }
 
-    async createFriendship(
-        userAId: number | string,
-        userBId: number | string,
-    ) {
+    async createFriendship(userAId: number | string, userBId: number | string) {
         try {
             const friendship = await this.prisma.friendship.create({
                 data: {
@@ -116,61 +116,63 @@ class Friendship {
                     userBId: Number(userBId),
                 },
                 include: {
-                    userA: true
-                }
+                    userA: true,
+                },
             });
 
             return friendship;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to create a friendship.");
+            throw new Error(
+                "Something went wrong when trying to create a friendship.",
+            );
         }
     }
 
-    async delete(
-        id: number | string
-    ) {
+    async delete(id: number | string) {
         try {
             const friendship = await this.prisma.friendship.delete({
                 where: {
-                    id: Number(id)
-                }
+                    id: Number(id),
+                },
             });
 
             return friendship;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to delete a friendship.");
+            throw new Error(
+                "Something went wrong when trying to delete a friendship.",
+            );
         }
     }
 
-    async getPendingFriendships(
-        userAId: string | number,
-    ) {
+    async getPendingFriendships(userAId: string | number) {
         try {
             const friendships = await this.prisma.friendship.findMany({
                 where: {
                     status: "PENDING",
-                    userBId: Number(userAId)
+                    userBId: Number(userAId),
                 },
                 include: {
                     userA: true,
                 },
                 orderBy: {
-                    createdAt: "desc"
-                }
+                    createdAt: "desc",
+                },
             });
 
             return friendships;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when tryint to get pending friendships.");
+            throw new Error(
+                "Something went wrong when tryint to get pending friendships.",
+            );
         }
     }
 
     async handleFriendshipResponse(
         friendshipId: number | string,
-        status: "ACCEPTED" | "PENDING"
+        status: "ACCEPTED" | "PENDING",
     ) {
         try {
             const friendship = await this.prisma.friendship.update({
@@ -184,38 +186,40 @@ class Friendship {
                 include: {
                     userA: {
                         omit: {
-                            password: true
-                        }
+                            password: true,
+                        },
                     },
                     userB: {
                         omit: {
-                            password: true
-                        }
+                            password: true,
+                        },
                     },
-                }
+                },
             });
 
             return friendship;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to handle the friendship response.");
+            throw new Error(
+                "Something went wrong when trying to handle the friendship response.",
+            );
         }
     }
 
-    async getFriendshipById(
-        id: string | number
-    ) {
+    async getFriendshipById(id: string | number) {
         try {
             const friendship = await this.prisma.friendship.findUnique({
                 where: {
-                    id: Number(id)
-                }
+                    id: Number(id),
+                },
             });
 
             return friendship;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to get a friendship by it's id.");
+            throw new Error(
+                "Something went wrong when trying to get a friendship by it's id.",
+            );
         }
     }
 
@@ -230,15 +234,19 @@ class Friendship {
                         { userAId: Number(userAId), userBId: Number(userBId) },
                         { userAId: Number(userBId), userBId: Number(userAId) },
                     ],
-                }
+                },
             });
 
             return friendship;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to get a friendship by it's participants.");
+            throw new Error(
+                "Something went wrong when trying to get a friendship by it's participants.",
+            );
         }
     }
 }
 
-export default new Friendship(process.env.NODE_ENV === "test" ? test_client : client);
+export default new Friendship(
+    process.env.NODE_ENV === "test" ? test_client : client,
+);

@@ -13,10 +13,9 @@ const validationChain = [
         .bail()
         .custom(checkIfMessageExistsById)
         .bail()
-        .custom(checkIfUserCanDeleteMessage)
+        .custom(checkIfUserCanDeleteMessage),
 ];
 
 const validateMessagesDeletion = validateChain(validationChain);
 
 export default validateMessagesDeletion;
-

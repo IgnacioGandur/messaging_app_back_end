@@ -6,21 +6,11 @@ import validateUserExistence from "../middlewares/validators/users/validateUserE
 
 const usersRouter = Router();
 
-usersRouter
-    .route("/")
-    .all(isAuthenticated)
-    .get(usersController.getAll);
+usersRouter.route("/").all(isAuthenticated).get(usersController.getAll);
 
 usersRouter
     .route("/:id")
-    .get(
-        validateUserExistence,
-        usersController.get
-    )
-    .delete(
-        isAuthenticated,
-        validateUserDeletion,
-        usersController.delete
-    );
+    .get(validateUserExistence, usersController.get)
+    .delete(isAuthenticated, validateUserDeletion, usersController.delete);
 
 export default usersRouter;

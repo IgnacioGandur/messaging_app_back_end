@@ -5,7 +5,7 @@ import { Conversation, Participant } from "../generated/prisma/index.js";
 interface ConversationPayload extends Conversation {
     participants: Participant[];
     recipientId: number;
-};
+}
 
 const registerNotificationsHandler = (_io: Server, socket: Socket) => {
     const notifyMessage = (payload: MessagePayload) => {

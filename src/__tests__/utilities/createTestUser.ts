@@ -5,7 +5,7 @@ const createTestUser = async (
     username: string,
     firstName: string,
     lastName: string,
-    password: string
+    password: string,
 ) => {
     try {
         const hashedPass = await bcrypt.hash(password, 10);
@@ -15,8 +15,8 @@ const createTestUser = async (
                 firstName,
                 lastName,
                 password: hashedPass,
-                profilePictureUrl: ""
-            }
+                profilePictureUrl: "",
+            },
         });
         return user;
     } catch (error) {

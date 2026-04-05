@@ -1,7 +1,10 @@
 import { Meta } from "express-validator";
 import userModel from "../../../../db/user.js";
 
-export default async function checkIfUserExistsById(id: string | number, { req }: Meta) {
+export default async function checkIfUserExistsById(
+    id: string | number,
+    { req }: Meta,
+) {
     const user = await userModel.getUserById(id, true);
 
     if (!user) {
@@ -12,4 +15,3 @@ export default async function checkIfUserExistsById(id: string | number, { req }
     req.foundUser = user;
     return true;
 }
-

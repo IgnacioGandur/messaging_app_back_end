@@ -15,7 +15,7 @@ const validationChain = [
         .notEmpty()
         .withMessage("The password field can't be empty.")
         .bail()
-        .custom(checkIfPasswordIsCorrect)
+        .custom(checkIfPasswordIsCorrect),
 ];
 
 const validateLogin = validateChain(validationChain);

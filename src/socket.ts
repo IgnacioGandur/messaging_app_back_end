@@ -12,21 +12,21 @@ export const server = createServer(app);
 export const io = new Server(server, {
     cors: {
         origin: "http://localhost:5173",
-        methods: ["GET", "POST", "PUT", "DELETE"]
-    }
+        methods: ["GET", "POST", "PUT", "DELETE"],
+    },
 });
 
 const getAllOnlineUsers = async (io: Server) => {
     const sockets = await io.fetchSockets();
     const users = new Map();
 
-    sockets.forEach(s => {
+    sockets.forEach((s) => {
         const user = s.data.user;
 
         // Prevent duplicated users if the user has more than 1 window/tab open with his profile.
         if (user && user.userId) {
             users.set(user.userId, user);
-        };
+        }
     });
 
     return Array.from(users.values());
@@ -52,19 +52,26 @@ io.on("connect", async (socket) => {
         if (!userData.userId) return;
 
         const allSockets = await io.fetchSockets();
-        const isStillConnected = allSockets.some(s => s.data.user?.userId === userData.userId);
+        const isStillConnected = allSockets.some(
+            (s) => s.data.user?.userId === userData.userId,
+        );
 
-        // Update the database only when the socket disconnects 
+        // Update the database only when the socket disconnects
         // (this prevents multiple database trips if a user has multiple tabs/windows and closes them, update the db only in the last disconnection.)
         if (!isStillConnected) {
             const now = new Date();
             try {
                 await userModel.updateField(userData.userId, "lastActive", now);
-                io.emit("user_disconnected", { userId: userData.userId, lastActive: now });
+                io.emit("user_disconnected", {
+                    userId: userData.userId,
+                    lastActive: now,
+                });
             } catch (error) {
-                console.error("Failed when trying to update the 'lastActive' field when logging user out.");
-            };
-        };
+                console.error(
+                    "Failed when trying to update the 'lastActive' field when logging user out.",
+                );
+            }
+        }
 
         const allUsers = await getAllOnlineUsers(io);
         io.emit("update_user_list", allUsers);

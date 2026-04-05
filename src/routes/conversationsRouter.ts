@@ -12,7 +12,7 @@ conversationsRouter
     .get(conversationsController.getConversations)
     .post(
         validatePrivateConversationCreation,
-        conversationsController.createPrivateConversation
+        conversationsController.createPrivateConversation,
     );
 
 conversationsRouter
@@ -20,8 +20,7 @@ conversationsRouter
     .all(isAuthenticated)
     .get(
         validateConversationExistence,
-        conversationsController.getPrivateConversation
+        conversationsController.getPrivateConversation,
     );
 
 export default conversationsRouter;
-

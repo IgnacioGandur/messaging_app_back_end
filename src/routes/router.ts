@@ -18,9 +18,12 @@ router.use("/me", meRouter);
 router.use("/users", usersRouter);
 router.use("/conversations", conversationsRouter);
 router.use("/conversations/:id/messages", messagesRouter);
-router.use("/conversations/:id/participants", privateConversationParticipantsRouter);
+router.use(
+    "/conversations/:id/participants",
+    privateConversationParticipantsRouter,
+);
 router.use("/groups", groupsRouter);
-router.use("/groups/:id/participants", groupParticipantsRouter)
+router.use("/groups/:id/participants", groupParticipantsRouter);
 router.use("/friendships", friendshipsRouter);
 
 export default router;

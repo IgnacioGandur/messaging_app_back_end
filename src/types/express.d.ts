@@ -1,11 +1,16 @@
-import { Conversation, User, Prisma, Participant } from "../generated/prisma/client.js";
+import {
+    Conversation,
+    User,
+    Prisma,
+    Participant,
+} from "../generated/prisma/client.js";
 
 type ConversationWithMessagesAndParticipants = Prisma.ConversationGetPayload<{
     include: {
-        messages: true,
-        participants: true,
-    }
-}>
+        messages: true;
+        participants: true;
+    };
+}>;
 
 declare global {
     namespace Express {
@@ -17,4 +22,4 @@ declare global {
     }
 }
 
-export { };
+export {};

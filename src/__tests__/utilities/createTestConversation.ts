@@ -3,7 +3,7 @@ import test_client from "../../db/test_client.js";
 export default async function createTestPrivateConversation(
     userAId: number,
     userBId: number,
-    message: string
+    message: string,
 ) {
     const conversation = await test_client.conversation.create({
         data: {
@@ -11,33 +11,33 @@ export default async function createTestPrivateConversation(
             participants: {
                 create: [
                     {
-                        userId: Number(userAId)
+                        userId: Number(userAId),
                     },
                     {
-                        userId: Number(userBId)
+                        userId: Number(userBId),
                     },
-                ]
+                ],
             },
             messages: {
                 create: {
                     senderId: Number(userAId),
-                    content: message
-                }
-            }
+                    content: message,
+                },
+            },
         },
         include: {
             participants: {
                 include: {
                     user: {
                         omit: {
-                            password: true
-                        }
-                    }
-                }
+                            password: true,
+                        },
+                    },
+                },
             },
-            messages: true
-        }
+            messages: true,
+        },
     });
 
     return conversation;
-};
+}

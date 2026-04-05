@@ -5,9 +5,7 @@ const messagesController = {
     getMoreMessages: async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const {
-                cursor
-            } = req.query;
+            const { cursor } = req.query;
 
             const limit = 15;
 
@@ -19,14 +17,16 @@ const messagesController = {
 
             // Remove deleted messagess.
             const filteredMessages = messages.map((m) => {
-                return m.deleted ? { ...m, content: "Deleted message." } : m
+                return m.deleted ? { ...m, content: "Deleted message." } : m;
             });
 
             // Check if the "plus one" message is present.
             const hasMore = filteredMessages.length > limit;
 
             // If "plus one" remove the last message.
-            const data = hasMore ? filteredMessages.slice(0, limit) : filteredMessages;
+            const data = hasMore
+                ? filteredMessages.slice(0, limit)
+                : filteredMessages;
 
             const nextCursor = hasMore ? filteredMessages[limit].id : null;
 
@@ -37,13 +37,14 @@ const messagesController = {
                     messages: data.reverse(),
                     nextCursor,
                     hasMore,
-                }
+                },
             });
         } catch (error) {
             console.error("Controller error:", error);
             return res.json({
                 error: true,
-                message: "Server error. We were not able to get the messages from this conversation.",
+                message:
+                    "Server error. We were not able to get the messages from this conversation.",
             });
         }
     },
@@ -61,7 +62,7 @@ const messagesController = {
                     senderId,
                     file.name,
                     file.type,
-                    file.url
+                    file.url,
                 );
 
                 return res.json({
@@ -71,30 +72,29 @@ const messagesController = {
                 });
             }
 
-
             const sentMessage = await messagesModel.create(
                 conversationId,
                 message,
-                senderId
+                senderId,
             );
 
             return res.json({
                 success: true,
                 message: "Message sent successfully!",
-                sentMessage
+                sentMessage,
             });
         } catch (error) {
             console.error("Controller error:", error);
             return res.json({
                 error: true,
                 message: "Server error. We were not able to send your message.",
-            })
+            });
         }
     },
 
     deleteMessage: async (req: Request, res: Response) => {
         try {
-            const { mid: id } = req.params // Message id.
+            const { mid: id } = req.params; // Message id.
             const message = await messagesModel.delete(id);
             return res.json({
                 success: true,
@@ -105,10 +105,11 @@ const messagesController = {
             console.error("Controller error:", error);
             return res.status(500).json({
                 error: true,
-                message: "Server error. We were not able to delete your message.",
+                message:
+                    "Server error. We were not able to delete your message.",
             });
         }
     },
-}
+};
 
 export default messagesController;

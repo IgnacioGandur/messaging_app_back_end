@@ -1,4 +1,4 @@
-import test_client from "../../db/test_client.js"
+import test_client from "../../db/test_client.js";
 
 export default async function createTestFriendship(
     userAId: number,
@@ -7,8 +7,8 @@ export default async function createTestFriendship(
     const friendship = await test_client.friendship.create({
         data: {
             userAId,
-            userBId
-        }
+            userBId,
+        },
     });
 
     return friendship;

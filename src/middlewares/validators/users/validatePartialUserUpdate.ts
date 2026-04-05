@@ -10,7 +10,7 @@ const validationChain = [
         .isURL()
         .withMessage("The profile picture URL field should be a URL.")
         .bail()
-        .custom(checkIfUrlPointsToImage)
+        .custom(checkIfUrlPointsToImage),
 ];
 
 const validatePartialUserUpdate = validateChain(validationChain);

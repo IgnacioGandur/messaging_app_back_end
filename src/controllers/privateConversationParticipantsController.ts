@@ -8,15 +8,15 @@ const privateConversationParticipantsController = {
 
         const participant = await participantModel.leavePrivateConversation(
             conversationId,
-            userId
+            userId,
         );
 
         return res.json({
             success: true,
             message: "User leaved privated conversation successfully!",
-            participant
+            participant,
         });
     },
-}
+};
 
 export default privateConversationParticipantsController;

@@ -10,6 +10,5 @@ describe("Index Router", () => {
             .expect("Content-Type", /json/);
         expect(response.body.success).toBe(true);
         expect(response.body.message).toBe("Index route reached!");
-    })
-})
-
+    });
+});

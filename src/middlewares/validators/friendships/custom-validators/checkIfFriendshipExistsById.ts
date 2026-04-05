@@ -1,8 +1,6 @@
 import friendshipsModel from "../../../../db/friendship.js";
 
-export default async function checkIfFriendshipExistsById(
-    id: string | number
-) {
+export default async function checkIfFriendshipExistsById(id: string | number) {
     const friendship = await friendshipsModel.getFriendshipById(id);
 
     if (!friendship) {
@@ -10,4 +8,4 @@ export default async function checkIfFriendshipExistsById(
     }
 
     return true;
-};
+}

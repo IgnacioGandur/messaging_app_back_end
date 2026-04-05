@@ -14,21 +14,24 @@ const conversationsController = {
                 return res.status(404).json({
                     success: false,
                     message: "Conversation not found.",
-                    errors: [{
-                        msg: `The conversation with an Id of: "${conversationId}" doesn't exist.`,
-                    }],
-                })
+                    errors: [
+                        {
+                            msg: `The conversation with an Id of: "${conversationId}" doesn't exist.`,
+                        },
+                    ],
+                });
             }
 
             // Replace "deleted" messages if any.
             const filteredConversation = {
                 ...conversation,
                 messages: conversation!.messages.map((m) =>
-                    m.deleted ? { ...m, content: "Deleted message." } : m
+                    m.deleted ? { ...m, content: "Deleted message." } : m,
                 ),
             };
 
-            const messageCursorId = conversation?.messages[conversation.messages.length - 1]?.id;
+            const messageCursorId =
+                conversation?.messages[conversation.messages.length - 1]?.id;
             const hasMore = conversation?.messages.length! > 10;
 
             return res.json({
@@ -36,7 +39,7 @@ const conversationsController = {
                 message: "Private conversation retrieved successfully!",
                 conversation: filteredConversation,
                 messageCursorId,
-                hasMore
+                hasMore,
             });
         } catch (error) {
             console.error("Controller error:", error);
@@ -49,7 +52,8 @@ const conversationsController = {
         const search = req.query.search as string;
         const take = req.query.take as string;
 
-        const { conversations, count } = await conversationModel.getUserConversations(id, search, take);
+        const { conversations, count } =
+            await conversationModel.getUserConversations(id, search, take);
 
         const filteredConversations = conversations.map((c) => ({
             ...c,
@@ -64,36 +68,41 @@ const conversationsController = {
             message: "User conversations retrieved successfully!",
             data: {
                 conversations: filteredConversations,
-                count
-            }
+                count,
+            },
         });
     },
 
     createPrivateConversation: async (req: Request, res: Response) => {
         try {
             const { id: userAId } = req.user as { id: number };
-            const {
-                recipientId: userBId,
-                message
-            } = req.body;
+            const { recipientId: userBId, message } = req.body;
 
-            const conversation = await conversationModel.getPrivateConversation(userAId, userBId);
+            const conversation = await conversationModel.getPrivateConversation(
+                userAId,
+                userBId,
+            );
 
             if (conversation) {
                 const createdMessage = await messagesModel.create(
                     conversation.id,
                     message,
-                    userAId
+                    userAId,
                 );
 
                 return res.json({
                     success: true,
                     message: "Conversation already exists. Message sent.",
                     createdMessage,
-                    conversation
+                    conversation,
                 });
             } else {
-                const newConversation = await conversationModel.createPrivateConversation(userAId, userBId, message);
+                const newConversation =
+                    await conversationModel.createPrivateConversation(
+                        userAId,
+                        userBId,
+                        message,
+                    );
                 return res.json({
                     success: true,
                     message: "Conversation created successfully!",
@@ -104,10 +113,11 @@ const conversationsController = {
             console.error("Controller error:", error);
             return res.json({
                 error: true,
-                message: "Server error. We were not able to create a conversation.",
-            })
+                message:
+                    "Server error. We were not able to create a conversation.",
+            });
         }
     },
-}
+};
 
 export default conversationsController;

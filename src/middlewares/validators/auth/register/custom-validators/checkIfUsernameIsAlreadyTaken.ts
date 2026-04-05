@@ -1,6 +1,8 @@
 import userModel from "../../../../../db/user.js";
 
-const checkIfUsernameIsAlreadyTaken = async (username: string): Promise<Boolean> => {
+const checkIfUsernameIsAlreadyTaken = async (
+    username: string,
+): Promise<Boolean> => {
     const user = await userModel.getUserByUsername(username);
 
     if (user) {
@@ -8,6 +10,6 @@ const checkIfUsernameIsAlreadyTaken = async (username: string): Promise<Boolean>
     }
 
     return true;
-}
+};
 
 export default checkIfUsernameIsAlreadyTaken;

@@ -6,7 +6,7 @@ const groupsController = {
         try {
             const { id: userId } = req.user as { id: number | string };
             const { title, description } = req.body;
-            const profilePicture = `https://ui-avatars.com/api/?name=${title.replaceAll(" ", "+",)}&background=random&color=fff`;
+            const profilePicture = `https://ui-avatars.com/api/?name=${title.replaceAll(" ", "+")}&background=random&color=fff`;
 
             const group = await groupsModel.createGroup(
                 profilePicture,
@@ -18,14 +18,14 @@ const groupsController = {
             return res.json({
                 success: true,
                 message: "Group created successfully!",
-                group
+                group,
             });
         } catch (error) {
             console.error("Controller error:", error);
             return res.status(500).json({
                 error: true,
                 message: "Server error. We were not able to create your group.",
-            })
+            });
         }
     },
 
@@ -33,7 +33,7 @@ const groupsController = {
         try {
             const { id } = req.user as { id: number };
             const page = Number(req.query.page) || 1;
-            const search = req.query.search as string || "";
+            const search = (req.query.search as string) || "";
             const pageSize = 10;
             const skip = (page - 1) * pageSize;
             const yourGroups = Boolean(req.query.yourGroups);
@@ -45,7 +45,7 @@ const groupsController = {
                 search,
                 yourGroups,
                 id,
-                joined
+                joined,
             );
 
             return res.json({
@@ -56,16 +56,16 @@ const groupsController = {
                     meta: {
                         count,
                         totalPages: Math.ceil(count / pageSize),
-                        currentPage: page
+                        currentPage: page,
                     },
-                }
+                },
             });
         } catch (error) {
             console.error("Controller error:", error);
             return res.status(500).json({
                 error: true,
                 message: "Server error. We were not able to get all groups.",
-            })
+            });
         }
     },
 
@@ -77,14 +77,15 @@ const groupsController = {
             return res.json({
                 success: true,
                 message: "Successfully joined to the group.",
-                participant
+                participant,
             });
         } catch (error) {
             console.error("Controller error:", error);
             return res.status(500).json({
                 error: true,
-                message: "Server error. We were not able join you to the group.",
-            })
+                message:
+                    "Server error. We were not able join you to the group.",
+            });
         }
     },
 
@@ -92,17 +93,12 @@ const groupsController = {
         try {
             const { id } = req.params;
             const { title, description, ppf } = req.body;
-            const group = await groupsModel.update(
-                id,
-                title,
-                description,
-                ppf
-            );
+            const group = await groupsModel.update(id, title, description, ppf);
 
             return res.json({
                 success: true,
                 message: "Group updated successfully!",
-                group
+                group,
             });
         } catch (error) {
             console.error("Controller error:", error);
@@ -136,17 +132,16 @@ const groupsController = {
         const { id } = req.params;
         const { profilePictureUrl } = req.body;
 
-        const group = await groupsModel.partialUpdate(
-            id,
-            { profilePicture: profilePictureUrl }
-        );
+        const group = await groupsModel.partialUpdate(id, {
+            profilePicture: profilePictureUrl,
+        });
 
         return res.json({
             success: true,
             message: "Group's profile pictuer updated successfully!",
             group,
         });
-    }
-}
+    },
+};
 
 export default groupsController;

@@ -14,7 +14,7 @@ const validationChain = [
         .bail()
         .custom(checkIfGroupExistsById)
         .bail()
-        .custom(checkIfUserIsAlreadyParticipantInGroup)
+        .custom(checkIfUserIsAlreadyParticipantInGroup),
 ];
 
 const validateJoiningGroup = validateChain(validationChain);

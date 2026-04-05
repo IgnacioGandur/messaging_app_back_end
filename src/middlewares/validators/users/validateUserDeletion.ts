@@ -14,7 +14,7 @@ const validationChain = [
         .bail()
         .custom(checkIfUserExistsById)
         .bail()
-        .custom(checkIfUserIsAccountOwner)
+        .custom(checkIfUserIsAccountOwner),
 ];
 
 const validateUserDeletion = validateChain(validationChain);

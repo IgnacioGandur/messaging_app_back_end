@@ -1,4 +1,3 @@
-
 const checkIfUrlPointsToImage = async (url: string) => {
     const response = await fetch(url, { method: "HEAD" });
     const isImage = response.headers.get("Content-Type")?.startsWith("image");
@@ -8,6 +7,6 @@ const checkIfUrlPointsToImage = async (url: string) => {
     }
 
     return true;
-}
+};
 
 export default checkIfUrlPointsToImage;

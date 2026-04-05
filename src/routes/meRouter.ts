@@ -8,22 +8,10 @@ const meRouter = Router();
 
 meRouter
     .route("/")
-    .all(
-        isAuthenticated,
-    )
-    .get(
-        meController.get
-    )
-    .patch(
-        validateUserUpdate,
-        meController.patch
-    )
-    .put(
-        validatePartialUserUpdate,
-        meController.put
-    )
-    .delete(
-        meController.delete
-    );
+    .all(isAuthenticated)
+    .get(meController.get)
+    .patch(validateUserUpdate, meController.patch)
+    .put(validatePartialUserUpdate, meController.put)
+    .delete(meController.delete);
 
 export default meRouter;

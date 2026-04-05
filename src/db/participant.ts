@@ -20,17 +20,19 @@ class Participant {
                     userId_conversationId: {
                         conversationId: Number(conversationId),
                         userId: Number(userId),
-                    }
+                    },
                 },
                 data: {
-                    role
-                }
+                    role,
+                },
             });
 
             return participant;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to toggle the admin status of a group participant.");
+            throw new Error(
+                "Something went wrong when trying to toggle the admin status of a group participant.",
+            );
         }
     }
 
@@ -43,15 +45,17 @@ class Participant {
                 where: {
                     userId_conversationId: {
                         userId: Number(userId),
-                        conversationId: Number(groupId)
-                    }
-                }
+                        conversationId: Number(groupId),
+                    },
+                },
             });
 
             return participant;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong when trying to get a group participant by it's id.");
+            throw new Error(
+                "Something went wrong when trying to get a group participant by it's id.",
+            );
         }
     }
 
@@ -64,22 +68,21 @@ class Participant {
                 where: {
                     userId_conversationId: {
                         userId: Number(userId),
-                        conversationId: Number(conversationId)
-                    }
-                }
+                        conversationId: Number(conversationId),
+                    },
+                },
             });
 
             return participant;
         } catch (error) {
             console.error("Prisma error:", error);
-            throw new Error("Something went wrong whent tryint to remove a participant from a group conversation.");
+            throw new Error(
+                "Something went wrong whent tryint to remove a participant from a group conversation.",
+            );
         }
     }
 
-    async leaveGroup(
-        conversationId: number | string,
-        userId: number | string
-    ) {
+    async leaveGroup(conversationId: number | string, userId: number | string) {
         const cId = Number(conversationId);
         const uId = Number(userId);
 
@@ -90,8 +93,8 @@ class Participant {
                     conversationId: cId,
                 },
                 orderBy: {
-                    joinedAt: "asc"
-                }
+                    joinedAt: "asc",
+                },
             });
 
             if (participants.length === 0) return null;
@@ -105,26 +108,26 @@ class Participant {
             if (participants.length === 1) {
                 return await tx.conversation.delete({
                     where: {
-                        id: cId
-                    }
-                })
-            };
+                        id: cId,
+                    },
+                });
+            }
 
             // If user leaving group is group owner, pass ownership to next oldest user.
             if (userLeaving.role === "OWNER") {
-                const nextOwner = participants.find(p => p.userId !== uId);
+                const nextOwner = participants.find((p) => p.userId !== uId);
                 if (nextOwner) {
                     await tx.participant.update({
                         where: {
                             userId_conversationId: {
                                 userId: nextOwner.userId,
-                                conversationId: cId
-                            }
+                                conversationId: cId,
+                            },
                         },
                         data: {
-                            role: "OWNER"
-                        }
-                    })
+                            role: "OWNER",
+                        },
+                    });
                 }
             }
 
@@ -132,10 +135,10 @@ class Participant {
                 where: {
                     userId_conversationId: {
                         userId: uId,
-                        conversationId: cId
-                    }
-                }
-            })
+                        conversationId: cId,
+                    },
+                },
+            });
         });
     }
 
@@ -148,14 +151,16 @@ class Participant {
                 userId_conversationId: {
                     userId: Number(userId),
                     conversationId: Number(conversationId),
-                }
+                },
             },
             data: {
                 lastDeletedAt: new Date(),
-                listVisible: false
-            }
+                listVisible: false,
+            },
         });
     }
 }
 
-export default new Participant(process.env.NODE_ENV === "test" ? test_client : client);
+export default new Participant(
+    process.env.NODE_ENV === "test" ? test_client : client,
+);

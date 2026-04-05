@@ -1,20 +1,23 @@
 import { Meta } from "express-validator";
 import bcrypt from "bcryptjs";
 
-const checkIfPasswordIsCorrect = async (password: string, { req }: Meta): Promise<Boolean | undefined> => {
+const checkIfPasswordIsCorrect = async (
+    password: string,
+    { req }: Meta,
+): Promise<Boolean | undefined> => {
     const user = req.foundUser;
 
     if (!user) {
         return;
-    };
+    }
 
     const passwordIsCorrect = await bcrypt.compare(password, user!.password);
 
     if (!passwordIsCorrect) {
         throw new Error("The password is not correct.");
-    };
+    }
 
     return true;
-}
+};
 
 export default checkIfPasswordIsCorrect;

@@ -33,7 +33,7 @@ const validationChain = [
     body("description")
         .trim()
         .notEmpty()
-        .withMessage("The updated group description can't be empty.")
+        .withMessage("The updated group description can't be empty."),
 ];
 
 export const validateGroupUpdate = validateChain(validationChain);
