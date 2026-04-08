@@ -1,7 +1,7 @@
 import { defineConfig } from "prisma/config";
 
 export default defineConfig({
-    schema: "prisma/prisma.schema",
+    schema: "prisma/schema.prisma",
     datasource: {
         url: String(process.env.DATABASE_URL),
     },
