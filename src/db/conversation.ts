@@ -1,6 +1,6 @@
 import test_client from "./test_client.js";
 import client from "./client.js";
-import { type PrismaClient, type Prisma } from "../generated/prisma/index.js";
+import type { Prisma, PrismaClient } from "@prisma/client";
 
 type ConversationWithParticipantsAndMessages = Prisma.ConversationGetPayload<{
     include: {

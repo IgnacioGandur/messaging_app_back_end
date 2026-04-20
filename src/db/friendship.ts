@@ -1,6 +1,6 @@
 import client from "./client.js";
 import test_client from "./test_client.js";
-import type { PrismaClient, Prisma } from "../generated/prisma/client.js";
+import type { PrismaClient, Prisma} from "@prisma/client";
 
 class Friendship {
     prisma: PrismaClient;

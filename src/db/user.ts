@@ -1,10 +1,6 @@
 import client from "./client.js";
 import test_client from "./test_client.js";
-import {
-    type PrismaClient,
-    type User as UserType,
-    Prisma,
-} from "../generated/prisma/client.js";
+import type { PrismaClient, User as UserType, Prisma } from "@prisma/client";
 
 type UserWithoutPassword = Omit<Prisma.UserGetPayload<{}>, "password">;
 
