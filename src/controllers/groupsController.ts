@@ -71,7 +71,7 @@ const groupsController = {
 
     joinGroup: async (req: Request, res: Response) => {
         try {
-            const { id: groupId } = req.params;
+            const { id: groupId } = req.params as { id: string };
             const { id: userId } = req.user as { id: number };
             const participant = await groupsModel.join(groupId, userId);
             return res.json({
@@ -91,7 +91,7 @@ const groupsController = {
 
     updateGroup: async (req: Request, res: Response) => {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
             const { title, description, ppf } = req.body;
             const group = await groupsModel.update(id, title, description, ppf);
 
@@ -111,7 +111,7 @@ const groupsController = {
 
     deleteGroup: async (req: Request, res: Response) => {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
             const group = await groupsModel.delete(id);
 
             return res.json({
@@ -129,7 +129,7 @@ const groupsController = {
     },
 
     put: async (req: Request, res: Response) => {
-        const { id } = req.params;
+        const { id } = req.params as { id: string };
         const { profilePictureUrl } = req.body;
 
         const group = await groupsModel.partialUpdate(id, {

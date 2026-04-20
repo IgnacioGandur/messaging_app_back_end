@@ -9,7 +9,7 @@
         "dev": "NODE_ENV=development && tsx --watch --env-file .env src/server.ts",
         "start": "NODE_ENV=production && node --env-file .env dist/server.js",
         "build": "tsc",
-        "postinstall":"prisma generate",
+        "postinstall": "prisma generate",
         "test": "NODE_ENV=test && vitest",
         "test:run": "NODE_ENV=test && vitest --run",
         "test:ui": "NODE_ENV=test && vitest --ui",
@@ -30,6 +30,7 @@
     },
     "homepage": "https://github.com/IgnacioGandur/messaging_app_back_end#readme",
     "dependencies": {
+        "@prisma/adapter-pg": "^7.7.0",
         "@quixo3/prisma-session-store": "^3.1.13",
         "@types/bcryptjs": "^2.4.6",
         "@types/cookie-parser": "^1.4.9",
@@ -49,6 +50,7 @@
         "multer": "^2.0.2",
         "passport": "^0.7.0",
         "passport-local": "^1.0.0",
+        "pg": "^8.20.0",
         "socket.io": "^4.8.1",
         "supertest": "^7.1.4"
     },

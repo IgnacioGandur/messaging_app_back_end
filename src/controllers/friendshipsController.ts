@@ -95,7 +95,7 @@ const friendshipsController = {
 
     deleteFriendship: async (req: Request, res: Response) => {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
             const friendship = await friendshipsModel.delete(id);
 
             return res.json({
@@ -115,8 +115,8 @@ const friendshipsController = {
 
     handleFriendshipRequest: async (req: Request, res: Response) => {
         try {
-            const { id } = req.params;
-            const { status } = req.body;
+            const { id } = req.params as { id: string };
+            const { status } = req.body as { status: "ACCEPTED" | "PENDING" };
 
             const friendship = await friendshipsModel.handleFriendshipResponse(
                 id,

@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import userModel from "../db/user.js";
-import cleanEmptyFields from "../utilities/cleanEmptyFields.js";
-import bcrypt from "bcryptjs";
 import handlePrismaErrors from "../utilities/handlePrismaErrors.js";
 
 const usersController = {
@@ -37,7 +35,7 @@ const usersController = {
 
     get: async (req: Request, res: Response) => {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
             const data = await userModel.getFullUserProfile(id);
 
             if (!data) {

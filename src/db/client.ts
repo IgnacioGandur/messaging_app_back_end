@@ -1,11 +1,8 @@
 import { PrismaClient } from "../generated/prisma/index.js";
+import adapter from "./adapter.js";
 
 const client = new PrismaClient({
-    datasources: {
-        db: {
-            url: process.env.DATABASE_URL,
-        },
-    },
+    adapter,
 });
 
 export default client;

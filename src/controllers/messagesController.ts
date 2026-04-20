@@ -4,7 +4,7 @@ import messagesModel from "../db/messages.js";
 const messagesController = {
     getMoreMessages: async (req: Request, res: Response) => {
         try {
-            const { id } = req.params;
+            const { id } = req.params as { id: string };
             const { cursor } = req.query;
 
             const limit = 15;
@@ -51,7 +51,7 @@ const messagesController = {
 
     sendMessage: async (req: Request, res: Response) => {
         try {
-            const { id: conversationId } = req.params;
+            const { id: conversationId } = req.params as { id: string };
             const { id: senderId } = req.user as { id: number };
             const { message, file } = req.body;
 
@@ -94,7 +94,7 @@ const messagesController = {
 
     deleteMessage: async (req: Request, res: Response) => {
         try {
-            const { mid: id } = req.params; // Message id.
+            const { mid: id } = req.params as { mid: string }; // Message id.
             const message = await messagesModel.delete(id);
             return res.json({
                 success: true,

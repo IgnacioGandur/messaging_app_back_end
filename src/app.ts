@@ -9,6 +9,13 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 
+const adapter = new PrismaPg({
+    connectionString:
+        process.env.NODE_ENV === "test"
+            ? process.env.TEST_DATABASE_URL
+            : process.env.DATABASE_URL,
+});
+
 app.use(
     cors({
         origin: "http://localhost:5173",
@@ -31,14 +38,7 @@ app.use(
         saveUninitialized: false,
         store: new PrismaSessionStore(
             new PrismaClient({
-                datasources: {
-                    db: {
-                        url:
-                            process.env.NODE_ENV === "test"
-                                ? process.env.TEST_DATABASE_URL
-                                : process.env.DATABASE_URL,
-                    },
-                },
+                adapter,
             }),
             {
                 checkPeriod: 1000 * 60 * 4,
@@ -52,6 +52,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 import "./middlewares/passport/passport.js";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 app.use(router);
 

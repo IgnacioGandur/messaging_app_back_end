@@ -4,7 +4,7 @@ import groupParticipantModel from "../db/participant.js";
 const groupParticipantsController = {
     updateUserRole: async (req: Request, res: Response) => {
         try {
-            const { id: conversationId } = req.params;
+            const { id: conversationId } = req.params as { id: string };
             const { userId, role } = req.body;
 
             const participant = await groupParticipantModel.updateAdminStatus(
@@ -30,7 +30,7 @@ const groupParticipantsController = {
 
     removeUserFromGroup: async (req: Request, res: Response) => {
         try {
-            const { id: conversationId } = req.params;
+            const { id: conversationId } = req.params as { id: string };
             const { userId, isLeavingGroup } = req.body;
 
             if (isLeavingGroup) {

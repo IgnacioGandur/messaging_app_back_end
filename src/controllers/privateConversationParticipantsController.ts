@@ -4,7 +4,7 @@ import participantModel from "../db/participant.js";
 const privateConversationParticipantsController = {
     patch: async (req: Request, res: Response) => {
         const { id: userId } = req.user as { id: number };
-        const { id: conversationId } = req.params;
+        const { id: conversationId } = req.params as { id: string };
 
         const participant = await participantModel.leavePrivateConversation(
             conversationId,
