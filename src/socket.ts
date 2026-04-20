@@ -1,7 +1,7 @@
 import app from "./app.js";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
-import userModel from "../src/db/user.js";
+import userModel from "./db/user.js";
 import registerFriendshipsHandler from "./handlers/registerFriendshipsHandler.js";
 import registerMessagesHandler from "./handlers/registerMessagesHandler.js";
 import registerNotificationsHandler from "./handlers/registerNotificationsHandler.js";
