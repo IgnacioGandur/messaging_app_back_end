@@ -1,9 +1,4 @@
-import {
-    Conversation,
-    User,
-    Prisma,
-    Participant,
-} from "../generated/prisma/client.js";
+import { Prisma } from "@prisma/client";
 
 type ConversationWithMessagesAndParticipants = Prisma.ConversationGetPayload<{
     include: {

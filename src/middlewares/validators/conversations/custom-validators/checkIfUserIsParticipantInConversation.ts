@@ -1,12 +1,9 @@
 import { Meta } from "express-validator";
-import { Participant } from "../../../../generated/prisma/index.js";
-// import conversationModel from "../../../../db/conversation.js";
+import { Participant } from "@prisma/client";
 
-export default async function checkIfUserIsParticipantInConversation(
-    id: number,
-    { req }: Meta,
-) {
-    // const conversation = await conversationModel.getPrivateConversationById(id);
+export default async function checkIfUserIsParticipantInConversation({
+    req,
+}: Meta) {
     const conversation = req.foundConversation;
 
     const { id: userId } = req.user as { id: number };

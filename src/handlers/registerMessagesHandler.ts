@@ -1,4 +1,4 @@
-import { Prisma } from "../generated/prisma/client.js";
+import { Prisma } from "@prisma/client";
 import { Server, Socket } from "socket.io";
 
 export type MessagePayload = Prisma.MessageGetPayload<{

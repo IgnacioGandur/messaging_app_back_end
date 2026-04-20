@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { MessagePayload } from "./registerMessagesHandler.js";
-import { Conversation, Participant } from "../generated/prisma/index.js";
+import { Conversation, Participant } from "@prisma/client";
 
 interface ConversationPayload extends Conversation {
     participants: Participant[];

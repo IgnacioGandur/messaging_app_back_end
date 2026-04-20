@@ -1,7 +1,7 @@
 import userModel from "../../db/user.js";
 import { Strategy } from "passport-local";
 import bcrypt from "bcryptjs";
-import { type User } from "../../generated/prisma/client.js";
+import type { User } from "@prisma/client";
 
 export default new Strategy(async function verify(username, password, done) {
     try {
