@@ -2,13 +2,21 @@ import { Request, Response } from "express";
 import conversationModel from "../db/conversation.js";
 import messagesModel from "../db/messages.js";
 import handlePrismaErrors from "../utilities/handlePrismaErrors.js";
+import { Prisma } from "@prisma/client";
+
+type ConversationWithMessages = Prisma.ConversationGetPayload<{
+    include: {
+        messages: true;
+    };
+}>;
 
 const conversationsController = {
     getPrivateConversation: async (req: Request, res: Response) => {
         try {
             const { id: conversationId } = req.params;
 
-            const conversation = req.foundConversation;
+            const conversation =
+                req.foundConversation as ConversationWithMessages;
 
             if (!conversation) {
                 return res.status(404).json({
@@ -25,7 +33,7 @@ const conversationsController = {
             // Replace "deleted" messages if any.
             const filteredConversation = {
                 ...conversation,
-                messages: conversation!.messages.map((m) =>
+                messages: conversation.messages.map((m) =>
                     m.deleted ? { ...m, content: "Deleted message." } : m,
                 ),
             };
